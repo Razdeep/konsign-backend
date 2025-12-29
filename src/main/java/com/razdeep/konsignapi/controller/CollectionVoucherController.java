@@ -1,6 +1,7 @@
 package com.razdeep.konsignapi.controller;
 
 import com.google.gson.Gson;
+import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.entity.BuyerEntity;
 import com.razdeep.konsignapi.model.CollectionVoucher;
 import com.razdeep.konsignapi.model.PendingBill;
@@ -17,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
 public class CollectionVoucherController {
 
     private final Gson gson;
@@ -34,7 +35,7 @@ public class CollectionVoucherController {
 
 
     @Timed
-    @GetMapping("/collection-voucher")
+    @GetMapping("/collection-vouchers")
     public ResponseEntity<String> getCollectionVoucher(@RequestParam("voucherNo") String voucherNo) {
         ResponseEntity<String> response;
         CollectionVoucher collectionVoucher = collectionVoucherService.getVoucherByVoucherNo(voucherNo);
@@ -47,7 +48,7 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @PostMapping("/collection-voucher")
+    @PostMapping("/collection-vouchers")
     public ResponseEntity<String> addCollectionVoucher(@RequestBody CollectionVoucher collectionVoucher) {
         Map<String, String> body = new HashMap<>();
         ResponseEntity<String> response;
@@ -62,7 +63,7 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @DeleteMapping("/collection-voucher/{voucherNo}")
+    @DeleteMapping("/collection-vouchers/{voucherNo}")
     ResponseEntity<String> deleteBuyer(@PathVariable String voucherNo) {
         String message;
         if (collectionVoucherService.deleteVoucher(voucherNo)) {
@@ -76,13 +77,13 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @GetMapping(value = "/get-pending-bills-to-be-collected", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/collection-vouchers/pending-bills", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Map<String, Object>> getPendingBillsToBeCollected(@RequestParam(required = false) String buyerId,
                                                               @RequestParam(required = false) String buyerName) {
         List<PendingBill> pendingBills;
-        if (buyerId != null && !buyerId.equals("")) {
+        if (buyerId != null && !buyerId.isEmpty()) {
             pendingBills = collectionVoucherService.getPendingBillsToBeCollected(buyerId);
-        } else if (buyerName != null && !buyerName.equals("")) {
+        } else if (buyerName != null && !buyerName.isEmpty()) {
             BuyerEntity retrievedBuyerEntity = buyerService.getBuyerByBuyerName(buyerName);
             if (retrievedBuyerEntity == null) {
                 String message = "Buyer name not found in database";

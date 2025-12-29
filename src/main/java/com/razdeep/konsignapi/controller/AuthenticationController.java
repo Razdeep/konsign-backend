@@ -32,7 +32,7 @@ import java.util.Optional;
 import com.razdeep.konsignapi.constant.KonsignConstant;
 
 @CrossOrigin
-@RestController
+@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
 public class AuthenticationController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
@@ -125,5 +125,11 @@ public class AuthenticationController {
         }
         responseVerdict.setMessage("Successfully registered");
         return new ResponseEntity<>(responseVerdict, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/")
+    public ResponseEntity<String> welcome() {
+        return new ResponseEntity<>("Welcome to konsign-api",
+                HttpStatus.OK);
     }
 }

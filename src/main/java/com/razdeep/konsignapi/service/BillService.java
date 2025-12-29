@@ -26,9 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
-public class BillEntryService {
+public class BillService {
 
-    private final Logger LOG = LoggerFactory.getLogger(BillEntryService.class.getName());
+    private final Logger LOG = LoggerFactory.getLogger(BillService.class.getName());
 
     private final BillMapper billMapper;
 
@@ -40,9 +40,9 @@ public class BillEntryService {
     private final BillEntryRepository billEntryRepository;
 
     @Autowired
-    public BillEntryService(BuyerService buyerService, SupplierService supplierService,
-                            TransportService transportService, CommonService commonService,
-                            BillEntryRepository billEntryRepository) {
+    public BillService(BuyerService buyerService, SupplierService supplierService,
+                       TransportService transportService, CommonService commonService,
+                       BillEntryRepository billEntryRepository) {
         this.buyerService = buyerService;
         this.supplierService = supplierService;
         this.transportService = transportService;

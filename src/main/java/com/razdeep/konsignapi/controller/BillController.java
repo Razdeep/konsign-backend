@@ -1,8 +1,9 @@
 package com.razdeep.konsignapi.controller;
 
+import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.ResponseVerdict;
-import com.razdeep.konsignapi.service.BillEntryService;
+import com.razdeep.konsignapi.service.BillService;
 import io.micrometer.core.annotation.Timed;
 import lombok.val;
 import org.slf4j.Logger;
@@ -15,20 +16,20 @@ import org.springframework.web.bind.annotation.*;
 
 
 @CrossOrigin
-@RestController
-public class BillEntryController {
+@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
+public class BillController {
 
-    private final static Logger LOG = LoggerFactory.getLogger(BillEntryController.class.getName());
+    private final static Logger LOG = LoggerFactory.getLogger(BillController.class.getName());
 
-    private final BillEntryService billEntryService;
+    private final BillService billService;
 
     @Autowired
-    public BillEntryController(BillEntryService billEntryService) {
-        this.billEntryService = billEntryService;
+    public BillController(BillService billService) {
+        this.billService = billService;
     }
 
     @Timed
-    @PostMapping(value = "/addBillEntry")
+    @PostMapping(value = "/bills")
     public ResponseEntity<ResponseVerdict> addBillEntry(@RequestBody Bill bill) {
         ResponseEntity<ResponseVerdict> response;
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -36,7 +37,7 @@ public class BillEntryController {
         if (bill.anyFieldEmpty()) {
             responseVerdict.setMessage("Saving bill failed because all fields are not properly filled");
             response = new ResponseEntity<>(responseVerdict, HttpStatus.NOT_ACCEPTABLE);
-        } else if (billEntryService.enterBill(bill)) {
+        } else if (billService.enterBill(bill)) {
             responseVerdict.setMessage("Successfully saved bill");
             response = new ResponseEntity<>(responseVerdict, HttpStatus.OK);
         } else {
@@ -47,9 +48,9 @@ public class BillEntryController {
     }
 
     @Timed
-    @GetMapping(value = "/getBill")
+    @GetMapping(value = "/bills")
     public ResponseEntity<ResponseVerdict> getBill(@RequestParam(name = "billNo") String billNo) {
-        val bill = billEntryService.getBill(billNo);
+        val bill = billService.getBill(billNo);
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (bill == null) {
             responseVerdict.setMessage("Bill not found");
@@ -60,11 +61,11 @@ public class BillEntryController {
     }
 
     @Timed
-    @GetMapping(value = "/getAllBills/{offset}/{pageSize}")
+    @GetMapping(value = "/bills/{offset}/{pageSize}")
     public ResponseEntity<ResponseVerdict> getAllBills(@PathVariable int offset, @PathVariable int pageSize) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        val bills = billEntryService.getAllBills(offset, pageSize);
+        val bills = billService.getAllBills(offset, pageSize);
         stopWatch.stop();
         LOG.info("billEntryService.getAllBills() took " + stopWatch.getLastTaskTimeMillis() + " ms");
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -77,10 +78,10 @@ public class BillEntryController {
     }
 
     @Timed
-    @DeleteMapping(value = "/bill")
+    @DeleteMapping(value = "/bills")
     public ResponseEntity<ResponseVerdict> deleteBill(@RequestParam(name = "billNo") String billNo) {
         ResponseVerdict responseVerdict = new ResponseVerdict();
-        if (billEntryService.deleteBill(billNo)) {
+        if (billService.deleteBill(billNo)) {
             responseVerdict.setMessage("Successfully deleted bill " + billNo);
         } else {
             responseVerdict.setMessage("Bill " + billNo + " is already deleted.");
@@ -88,9 +89,5 @@ public class BillEntryController {
         return new ResponseEntity<>(responseVerdict, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/")
-    public ResponseEntity<String> welcome() {
-        return new ResponseEntity<>("Welcome to konsign-api",
-                HttpStatus.OK);
-    }
+
 }

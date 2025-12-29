@@ -1,5 +1,6 @@
 package com.razdeep.konsignapi.controller;
 
+import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.model.Buyer;
 import com.razdeep.konsignapi.model.ResponseVerdict;
 import com.razdeep.konsignapi.model.Supplier;
@@ -13,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
+@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
 public class MasterController {
 
     private final SupplierService supplierService;
@@ -36,7 +37,7 @@ public class MasterController {
     }
 
     @Timed
-    @PostMapping("/addSupplier")
+    @PostMapping("/suppliers")
     ResponseEntity<ResponseVerdict> addSupplier(@RequestBody Supplier supplier) {
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (supplierService.addSupplier(supplier)) {
@@ -49,7 +50,7 @@ public class MasterController {
     }
 
     @Timed
-    @DeleteMapping("/supplier/{supplierId}")
+    @DeleteMapping("/suppliers/{supplierId}")
     ResponseEntity<ResponseVerdict> deleteSupplier(@PathVariable String supplierId) {
         String message;
         if (supplierService.deleteSupplier(supplierId)) {
@@ -71,7 +72,7 @@ public class MasterController {
     }
 
     @Timed
-    @PostMapping("/addBuyer")
+    @PostMapping("/buyers")
     ResponseEntity<ResponseVerdict> addBuyer(@RequestBody Buyer buyer) {
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (buyerService.addBuyer(buyer)) {
@@ -84,7 +85,7 @@ public class MasterController {
     }
 
     @Timed
-    @DeleteMapping("/buyer/{buyerId}")
+    @DeleteMapping("/buyers/{buyerId}")
     ResponseEntity<ResponseVerdict> deleteBuyer(@PathVariable String buyerId) {
         String message;
         if (buyerService.deleteBuyer(buyerId)) {
@@ -98,7 +99,7 @@ public class MasterController {
     }
 
     @Timed
-    @PostMapping("/transport")
+    @PostMapping("/transports")
     ResponseEntity<ResponseVerdict> addTransport(@RequestBody Transport transport) {
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (transportService.addTransport(transport)) {
@@ -119,7 +120,7 @@ public class MasterController {
     }
 
     @Timed
-    @DeleteMapping("/transport/{transportId}")
+    @DeleteMapping("/transports/{transportId}")
     ResponseEntity<ResponseVerdict> deleteTransport(@PathVariable String transportId) {
         String message;
         if (transportService.deleteTransport(transportId)) {
