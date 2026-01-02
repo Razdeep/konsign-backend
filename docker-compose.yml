@@ -9,7 +9,6 @@ services:
       POSTGRES_USER: konsign
       POSTGRES_PASSWORD: konsign
       POSTGRES_DB: konsign
-      TZ: Asia/Calcutta
     ports:
       - "5432:5432"
     volumes:
