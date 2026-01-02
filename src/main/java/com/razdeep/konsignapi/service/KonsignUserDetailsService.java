@@ -3,13 +3,12 @@ package com.razdeep.konsignapi.service;
 import com.razdeep.konsignapi.entity.KonsignUser;
 import com.razdeep.konsignapi.model.KonsignUserDetails;
 import com.razdeep.konsignapi.repository.KonsignUserRepository;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class KonsignUserDetailsService implements UserDetailsService {

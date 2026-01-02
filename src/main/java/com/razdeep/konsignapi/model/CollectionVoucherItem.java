@@ -21,6 +21,6 @@ public class CollectionVoucherItem {
 
     String ddNo;
 
-//    @JsonFormat(pattern="yyyy-MM-dd")
+    //    @JsonFormat(pattern="yyyy-MM-dd")
     String ddDate;
 }

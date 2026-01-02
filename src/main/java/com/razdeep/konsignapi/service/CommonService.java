@@ -4,20 +4,16 @@ import com.razdeep.konsignapi.model.KonsignUserDetails;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-
 @Service
 public class CommonService {
 
     private static final int MAX_INITIAL_SIZE = 4;
 
-    public CommonService() {
-
-    }
+    public CommonService() {}
 
     private boolean isVowel(char c) {
-        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u'
-                || c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U';
+        return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' || c == 'E' || c == 'I' || c == 'O'
+                || c == 'U';
     }
 
     private boolean isAlphabet(char c) {
@@ -47,7 +43,8 @@ public class CommonService {
     }
 
     public String getAgencyId() {
-        KonsignUserDetails konsignUserDetails = (KonsignUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        KonsignUserDetails konsignUserDetails = (KonsignUserDetails)
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (konsignUserDetails == null) {
             return null;
         }

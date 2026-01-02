@@ -1,9 +1,8 @@
 package com.razdeep.konsignapi.entity;
 
-import lombok.*;
-
-import javax.persistence.*;
 import java.time.LocalDate;
+import javax.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "collection_voucher_item")

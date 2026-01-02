@@ -2,8 +2,6 @@ package com.razdeep.konsignapi.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.data.domain.Sort;
-
 import java.util.List;
 
 public class CustomPageImpl<T> {
@@ -43,14 +41,14 @@ public class CustomPageImpl<T> {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public CustomPageImpl(@JsonProperty("content") List<T> content,
-                         @JsonProperty("number") int page,
-                         @JsonProperty("size") int size,
-                         @JsonProperty("totalElements") long total) {
+    public CustomPageImpl(
+            @JsonProperty("content") List<T> content,
+            @JsonProperty("number") int page,
+            @JsonProperty("size") int size,
+            @JsonProperty("totalElements") long total) {
         this.content = content;
         this.number = page;
         this.size = size;
         this.totalElements = total;
     }
-
 }

@@ -3,21 +3,20 @@ package com.razdeep.konsignapi.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.razdeep.konsignapi.entity.BillEntity;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonPropertyOrder({ "billNo" })
+@JsonPropertyOrder({"billNo"})
 public class Bill {
 
     @JsonProperty("supplierName")
@@ -51,15 +50,19 @@ public class Bill {
         this.billDate = other.getBillDate();
         this.transportName = other.getTransportEntity().getTransportName();
         this.lrDate = other.getLrDate();
-        this.lrPmList = other.getLrPmEntityList().stream().map(lrPmEntity
-                -> new LrPm(lrPmEntity.getLr(), lrPmEntity.getPm())).collect(Collectors.toList());
+        this.lrPmList = other.getLrPmEntityList().stream()
+                .map(lrPmEntity -> new LrPm(lrPmEntity.getLr(), lrPmEntity.getPm()))
+                .collect(Collectors.toList());
         this.billAmount = other.getBillAmount();
     }
 
     public boolean anyFieldEmpty() {
-        return Objects.equals(supplierName, "") || Objects.equals(buyerName, "") ||
-                Objects.equals(billNo, "") || Objects.equals(billDate, "") ||
-                Objects.equals(transportName, "") || Objects.equals(lrDate, "") ||
-                billAmount == 0.f;
+        return Objects.equals(supplierName, "")
+                || Objects.equals(buyerName, "")
+                || Objects.equals(billNo, "")
+                || Objects.equals(billDate, "")
+                || Objects.equals(transportName, "")
+                || Objects.equals(lrDate, "")
+                || billAmount == 0.f;
     }
 }

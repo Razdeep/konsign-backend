@@ -6,6 +6,10 @@ import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.CustomPageImpl;
 import com.razdeep.konsignapi.model.LrPm;
 import com.razdeep.konsignapi.repository.BillEntryRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import lombok.val;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
@@ -20,15 +24,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
 @Service
-public class BillEntryService {
+public class BillService {
 
-    private final Logger LOG = LoggerFactory.getLogger(BillEntryService.class.getName());
+    private final Logger LOG = LoggerFactory.getLogger(BillService.class.getName());
 
     private final BillMapper billMapper;
 
@@ -40,9 +39,12 @@ public class BillEntryService {
     private final BillEntryRepository billEntryRepository;
 
     @Autowired
-    public BillEntryService(BuyerService buyerService, SupplierService supplierService,
-                            TransportService transportService, CommonService commonService,
-                            BillEntryRepository billEntryRepository) {
+    public BillService(
+            BuyerService buyerService,
+            SupplierService supplierService,
+            TransportService transportService,
+            CommonService commonService,
+            BillEntryRepository billEntryRepository) {
         this.buyerService = buyerService;
         this.supplierService = supplierService;
         this.transportService = transportService;
@@ -51,10 +53,11 @@ public class BillEntryService {
         this.billMapper = Mappers.getMapper(BillMapper.class);
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "getAllBills", allEntries = true),
-            @CacheEvict(value = "getBill", key = "#bill.billNo")
-    })
+    @Caching(
+            evict = {
+                @CacheEvict(value = "getAllBills", allEntries = true),
+                @CacheEvict(value = "getBill", key = "#bill.billNo")
+            })
     public boolean enterBill(Bill bill) {
 
         BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
@@ -121,13 +124,14 @@ public class BillEntryService {
                 .lrDate(billEntry.getLrDate())
                 .build();
 
-//        return billMapper.billEntityToBill(billEntry);
+        //        return billMapper.billEntityToBill(billEntry);
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "getAllBills", allEntries = true),
-            @CacheEvict(value = "getBill", key = "#bill.billNo")
-    })
+    @Caching(
+            evict = {
+                @CacheEvict(value = "getAllBills", allEntries = true),
+                @CacheEvict(value = "getBill", key = "#bill.billNo")
+            })
     public boolean deleteBill(String billNo) {
         boolean wasPresent = false;
         if (billEntryRepository.findById(billNo).isPresent()) {
@@ -148,8 +152,8 @@ public class BillEntryService {
         val targetTransportEntity = transportService.getTransportByTransportName(bill.getTransportName());
         List<LrPmEntity> targetLrPmEntityList = new ArrayList<>();
         if (bill.getLrPmList() != null) {
-            targetLrPmEntityList = bill.getLrPmList().stream().map(LrPmEntity::new)
-                    .collect(Collectors.toList());
+            targetLrPmEntityList =
+                    bill.getLrPmList().stream().map(LrPmEntity::new).collect(Collectors.toList());
         }
         return BillEntity.builder()
                 .billNo(bill.getBillNo())
@@ -178,9 +182,7 @@ public class BillEntryService {
         LOG.info("repository call took {} ms", stopWatch.getLastTaskTimeMillis());
 
         stopWatch.start();
-        val billList = billEntityPages.stream()
-                .map(Bill::new)
-                .collect(Collectors.toList());
+        val billList = billEntityPages.stream().map(Bill::new).collect(Collectors.toList());
         stopWatch.stop();
         LOG.info("repository stream api conversion took {} ms", stopWatch.getLastTaskTimeMillis());
 

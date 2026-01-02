@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.razdeep.konsignapi.model.CustomPageImpl;
+import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,9 +22,6 @@ import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
-import org.springframework.data.redis.serializer.RedisSerializer;
-
-import java.time.Duration;
 
 @Configuration
 public class RedisCacheConfig {
@@ -53,9 +51,13 @@ public class RedisCacheConfig {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(60))
                 .disableCachingNullValues()
-//                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GsonRedisSerializer()));
-//                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.json()));
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(genericJackson2JsonRedisSerializer()));
+                //
+                // .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new
+                // GsonRedisSerializer()));
+                //
+                // .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.json()));
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(
+                        genericJackson2JsonRedisSerializer()));
     }
 
     @Bean
@@ -71,9 +73,8 @@ public class RedisCacheConfig {
         mapper.registerSubtypes(PageImpl.class);
         mapper.registerSubtypes(CustomPageImpl.class);
 
-        mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator(),
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY);
+        mapper.activateDefaultTyping(
+                mapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 
         return new GenericJackson2JsonRedisSerializer(mapper);
     }
@@ -91,9 +92,8 @@ public class RedisCacheConfig {
         mapper.registerSubtypes(PageImpl.class);
         mapper.registerSubtypes(CustomPageImpl.class);
 
-        mapper.activateDefaultTyping(mapper.getPolymorphicTypeValidator(),
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY);
+        mapper.activateDefaultTyping(
+                mapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 
         Jackson2JsonRedisSerializer<Page> serializer = new Jackson2JsonRedisSerializer<>(Page.class);
         serializer.setObjectMapper(mapper);

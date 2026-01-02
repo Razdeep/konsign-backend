@@ -3,14 +3,13 @@ package com.razdeep.konsignapi.service;
 import com.razdeep.konsignapi.entity.SupplierEntity;
 import com.razdeep.konsignapi.model.Supplier;
 import com.razdeep.konsignapi.repository.SupplierRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class SupplierService {
@@ -32,7 +31,6 @@ public class SupplierService {
         return supplierRepository.findById(supplierId).isPresent();
     }
 
-
     public List<Supplier> getSuppliers() {
         String agencyId = commonService.getAgencyId();
         return self.getSupplierByAgencyId(agencyId);
@@ -52,7 +50,9 @@ public class SupplierService {
     @CacheEvict(value = "getSuppliers", allEntries = true)
     public boolean addSupplier(Supplier supplier) {
         String agencyId = commonService.getAgencyId();
-        if (!supplierRepository.findAllSupplierBySupplierNameAndAgencyId(supplier.getSupplierName(), agencyId).isEmpty()) {
+        if (!supplierRepository
+                .findAllSupplierBySupplierNameAndAgencyId(supplier.getSupplierName(), agencyId)
+                .isEmpty()) {
             return false;
         }
         if (supplier.getSupplierId().isEmpty()) {
@@ -76,7 +76,9 @@ public class SupplierService {
     @CacheEvict(value = "getSuppliers", allEntries = true)
     public boolean deleteSupplier(String supplierId) {
         String agencyId = commonService.getAgencyId();
-        boolean wasPresent = supplierRepository.findSupplierBySupplierIdAndAgencyId(supplierId, agencyId).isPresent();
+        boolean wasPresent = supplierRepository
+                .findSupplierBySupplierIdAndAgencyId(supplierId, agencyId)
+                .isPresent();
         if (wasPresent) {
             supplierRepository.deleteById(supplierId);
         }

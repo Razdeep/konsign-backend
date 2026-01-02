@@ -1,12 +1,11 @@
 package com.razdeep.konsignapi.entity;
 
-import lombok.*;
-
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.List;
+import lombok.*;
 
 @Entity
 @Table(name = "transport")

@@ -3,6 +3,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("jvm") version "1.9.24" apply false // remove if not using Kotlin code
     id("java")
+    id("com.diffplug.spotless") version "8.1.0"
 }
 
 group = "com.razdeep"
@@ -17,6 +18,19 @@ java {
 
 repositories {
     mavenCentral()
+}
+
+spotless {
+    java {
+        target("src/**/*.java")
+
+        palantirJavaFormat()
+        removeUnusedImports()
+        endWithNewline()
+        trimTrailingWhitespace()
+
+        lineEndings = com.diffplug.spotless.LineEnding.UNIX
+    }
 }
 
 dependencies {

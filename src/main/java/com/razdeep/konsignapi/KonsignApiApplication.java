@@ -6,10 +6,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@SpringBootApplication(exclude= {UserDetailsServiceAutoConfiguration.class})
+@SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
 @EnableCaching
 public class KonsignApiApplication implements CommandLineRunner {
 
@@ -23,7 +22,5 @@ public class KonsignApiApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
-
-    }
+    public void run(String... args) {}
 }

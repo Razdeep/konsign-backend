@@ -1,12 +1,11 @@
 package com.razdeep.konsignapi.entity;
 
 import com.razdeep.konsignapi.model.Buyer;
+import java.util.List;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-
-import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "buyer")
@@ -27,7 +26,5 @@ public class BuyerEntity extends BaseTimestamp {
         buyerName = buyer.getBuyerName();
     }
 
-    public BuyerEntity() {
-
-    }
+    public BuyerEntity() {}
 }

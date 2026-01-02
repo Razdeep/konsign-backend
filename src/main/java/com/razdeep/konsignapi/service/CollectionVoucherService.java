@@ -7,11 +7,6 @@ import com.razdeep.konsignapi.model.CollectionVoucher;
 import com.razdeep.konsignapi.model.CollectionVoucherItem;
 import com.razdeep.konsignapi.model.PendingBill;
 import com.razdeep.konsignapi.repository.CollectionVoucherRepository;
-import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,20 +14,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
 
 @Service
 public class CollectionVoucherService {
 
     private final CollectionVoucherRepository collectionVoucherRepository;
     private final BuyerService buyerService;
-    private final BillEntryService billEntryService;
+    private final BillService billService;
 
     @Autowired
-    public CollectionVoucherService(CollectionVoucherRepository collectionVoucherRepository, BuyerService buyerService,
-                                    BillEntryService billEntryService) {
+    public CollectionVoucherService(
+            CollectionVoucherRepository collectionVoucherRepository,
+            BuyerService buyerService,
+            BillService billService) {
         this.collectionVoucherRepository = collectionVoucherRepository;
         this.buyerService = buyerService;
-        this.billEntryService = billEntryService;
+        this.billService = billService;
     }
 
     public boolean addCollectionVoucher(CollectionVoucher collectionVoucher) {
@@ -46,17 +47,18 @@ public class CollectionVoucherService {
                 .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
                 .build();
 
-//        collectionVoucherEntity.setCreationTimestamp(getVoucherByVoucherNo(collectionVoucher.getVoucherNo()));
+        //
+        // collectionVoucherEntity.setCreationTimestamp(getVoucherByVoucherNo(collectionVoucher.getVoucherNo()));
 
         List<CollectionVoucherItemEntity> collectionVoucherItemEntityList;
         AtomicInteger collectionVoucherItemIndex = new AtomicInteger();
 
         collectionVoucherItemEntityList = collectionVoucher.getCollectionVoucherItemList().stream()
                 .map(collectionVoucherItem -> {
-                    val targetBill = billEntryService.getBill(collectionVoucherItem.getBillNo());
-                    val targetBilEntity = billEntryService.convertBillIntoBillEntity(targetBill);
-                    val collectionVoucherItemId = collectionVoucher.getVoucherNo()
-                            + "_" + collectionVoucherItemIndex.getAndIncrement();
+                    val targetBill = billService.getBill(collectionVoucherItem.getBillNo());
+                    val targetBilEntity = billService.convertBillIntoBillEntity(targetBill);
+                    val collectionVoucherItemId =
+                            collectionVoucher.getVoucherNo() + "_" + collectionVoucherItemIndex.getAndIncrement();
                     return CollectionVoucherItemEntity.builder()
                             .collectionVoucherItemId(collectionVoucherItemId)
                             .collectionVoucher(collectionVoucherEntity)
@@ -81,13 +83,14 @@ public class CollectionVoucherService {
     }
 
     public List<PendingBill> getPendingBillsToBeCollected(String buyerId) {
-        List<Bill> billsByBuyerId = billEntryService.getBillsByBuyerId(buyerId);
-        val collectedAmountSoFar =  this.getCollectedAmountInfoForBuyerId(buyerId);
+        List<Bill> billsByBuyerId = billService.getBillsByBuyerId(buyerId);
+        val collectedAmountSoFar = this.getCollectedAmountInfoForBuyerId(buyerId);
         List<PendingBill> res = new ArrayList<>();
-        for (val billByBuyerId: billsByBuyerId) {
+        for (val billByBuyerId : billsByBuyerId) {
             if (collectedAmountSoFar.containsKey(billByBuyerId.getBillNo())) {
                 if (billByBuyerId.getBillAmount() > collectedAmountSoFar.get(billByBuyerId.getBillNo())) {
-                    val pendingBillAmount = billByBuyerId.getBillAmount() - collectedAmountSoFar.get(billByBuyerId.getBillNo());
+                    val pendingBillAmount =
+                            billByBuyerId.getBillAmount() - collectedAmountSoFar.get(billByBuyerId.getBillNo());
                     val pendingBill = PendingBill.builder()
                             .billNo(billByBuyerId.getBillNo())
                             .billAmount(billByBuyerId.getBillAmount())
@@ -115,10 +118,11 @@ public class CollectionVoucherService {
         val collectionVouchers = collectionVoucherRepository.getCollectedAmountInfoForBuyerId(buyerId);
         Map<String, Double> res = new HashMap<>();
 
-        for (val collectionVoucher: collectionVouchers) {
-            for (val collectionVoucherItem: collectionVoucher.getCollectionVoucherItemEntityList()) {
+        for (val collectionVoucher : collectionVouchers) {
+            for (val collectionVoucherItem : collectionVoucher.getCollectionVoucherItemEntityList()) {
                 if (res.containsKey(collectionVoucherItem.getBill().getBillNo())) {
-                    val newValue = res.get(collectionVoucherItem.getBill().getBillNo()) + collectionVoucherItem.getAmountCollected();
+                    val newValue = res.get(collectionVoucherItem.getBill().getBillNo())
+                            + collectionVoucherItem.getAmountCollected();
                     res.put(collectionVoucherItem.getBill().getBillNo(), newValue);
                 } else {
                     res.put(collectionVoucherItem.getBill().getBillNo(), collectionVoucherItem.getAmountCollected());
@@ -135,8 +139,8 @@ public class CollectionVoucherService {
 
     @Nullable
     public CollectionVoucher getVoucherByVoucherNo(String voucherNo) {
-        CollectionVoucherEntity collectionVoucherEntity = collectionVoucherRepository
-                .getCollectionVoucherByVoucherNo(voucherNo);
+        CollectionVoucherEntity collectionVoucherEntity =
+                collectionVoucherRepository.getCollectionVoucherByVoucherNo(voucherNo);
 
         if (collectionVoucherEntity == null) {
             return null;
@@ -145,7 +149,7 @@ public class CollectionVoucherService {
         val collectionVoucherItemList = collectionVoucherEntity.getCollectionVoucherItemEntityList().stream()
                 .map(collectionVoucherItemEntity -> {
                     val billNo = collectionVoucherItemEntity.getBill().getBillNo();
-                    Bill bill = billEntryService.getBill(billNo);
+                    Bill bill = billService.getBill(billNo);
                     val supplierName = bill.getSupplierName();
                     val billAmount = bill.getBillAmount();
                     val pendingBillAmount = billAmount - getCollectedAmountForBillNo(billNo);
@@ -159,7 +163,8 @@ public class CollectionVoucherService {
                             .ddNo(collectionVoucherItemEntity.getDdNo())
                             .ddDate(String.valueOf(collectionVoucherItemEntity.getDdDate()))
                             .build();
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
 
         return CollectionVoucher.builder()
                 .voucherNo(collectionVoucherEntity.getVoucherNo())
