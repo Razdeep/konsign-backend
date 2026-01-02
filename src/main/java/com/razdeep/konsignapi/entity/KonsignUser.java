@@ -1,10 +1,9 @@
 package com.razdeep.konsignapi.entity;
 
 import com.razdeep.konsignapi.model.UserRegistration;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "User")
@@ -17,12 +16,14 @@ public class KonsignUser extends BaseTimestamp {
 
     @Column(name = "username", unique = true)
     private String username;
+
     private String password;
     private String emailAddress;
     private String mobile;
     private String agencyId;
     private boolean active;
     private String roles;
+
     public KonsignUser() {}
 
     public KonsignUser(UserRegistration userRegistration) {

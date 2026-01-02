@@ -1,10 +1,9 @@
 package com.razdeep.konsignapi.entity;
 
-import lombok.*;
-
-import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import javax.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "collection_vouchers")
@@ -26,5 +25,4 @@ public class CollectionVoucherEntity extends BaseTimestamp {
 
     @OneToMany(mappedBy = "collectionVoucher", cascade = CascadeType.ALL)
     private List<CollectionVoucherItemEntity> collectionVoucherItemEntityList;
-
 }

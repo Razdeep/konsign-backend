@@ -1,6 +1,7 @@
 package com.razdeep.konsignapi.controller;
 
 import com.razdeep.konsignapi.config.KonsignConfig;
+import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.exception.UsernameAlreadyExists;
 import com.razdeep.konsignapi.model.AuthenticationRequest;
 import com.razdeep.konsignapi.model.AuthenticationResponse;
@@ -10,6 +11,12 @@ import com.razdeep.konsignapi.service.AuthenticationService;
 import com.razdeep.konsignapi.service.JwtUtilService;
 import com.razdeep.konsignapi.service.KonsignUserDetailsService;
 import io.jsonwebtoken.impl.DefaultClaims;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Optional;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +28,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Optional;
-
-import com.razdeep.konsignapi.constant.KonsignConstant;
 
 @CrossOrigin
 @RestController(KonsignConstant.CONTROLLER_API_PREFIX)
@@ -43,7 +41,11 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, KonsignUserDetailsService konsignUserDetailsService, JwtUtilService jwtUtilService, AuthenticationService authenticationService) {
+    public AuthenticationController(
+            AuthenticationManager authenticationManager,
+            KonsignUserDetailsService konsignUserDetailsService,
+            JwtUtilService jwtUtilService,
+            AuthenticationService authenticationService) {
         this.authenticationManager = authenticationManager;
         this.konsignUserDetailsService = konsignUserDetailsService;
         this.jwtUtilService = jwtUtilService;
@@ -51,26 +53,30 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/authenticate")
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) {
+    public ResponseEntity<?> authenticate(
+            @RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(),
-                    authenticationRequest.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    authenticationRequest.getUsername(), authenticationRequest.getPassword()));
         } catch (BadCredentialsException e) {
             return ResponseEntity.badRequest().body("Username or password mismatch");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        final UserDetails konsignUserDetails = konsignUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails konsignUserDetails =
+                konsignUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
         final String accessToken = jwtUtilService.generateToken(konsignUserDetails);
         final AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setAccessToken(accessToken);
 
-        Cookie cookie = new Cookie(KonsignConstant.HEADER_REFRESH_TOKEN, jwtUtilService.doGenerateRefreshToken(new HashMap<>(), authenticationRequest.getUsername()));
+        Cookie cookie = new Cookie(
+                KonsignConstant.HEADER_REFRESH_TOKEN,
+                jwtUtilService.doGenerateRefreshToken(new HashMap<>(), authenticationRequest.getUsername()));
 
         cookie.setMaxAge(KonsignConfig.cookieMaxAge);
 
-//        cookie.setSecure(true);
+        //        cookie.setSecure(true);
         cookie.setHttpOnly(KonsignConfig.cookieHttpOnly);
         cookie.setPath(KonsignConfig.cookiePath);
 
@@ -99,7 +105,9 @@ public class AuthenticationController {
 
         try {
             if (jwtUtilService.validateToken(refreshToken, null)) {
-//                jwtUtilService.validateToken(jwtUtilService.extractAccessTokenFromRequest(request), null);
+                //
+                // jwtUtilService.validateToken(jwtUtilService.extractAccessTokenFromRequest(request),
+                // null);
                 DefaultClaims claims = (DefaultClaims) request.getAttribute(KonsignConstant.HEADER_CLAIMS);
                 val claimsMap = jwtUtilService.getMapFromIoJsonWebTokenClaims(claims);
                 String jwtToken = jwtUtilService.doGenerateRefreshToken(claimsMap, (String) claimsMap.get("sub"));
@@ -129,7 +137,6 @@ public class AuthenticationController {
 
     @GetMapping(value = "/")
     public ResponseEntity<String> welcome() {
-        return new ResponseEntity<>("Welcome to konsign-api",
-                HttpStatus.OK);
+        return new ResponseEntity<>("Welcome to konsign-api", HttpStatus.OK);
     }
 }

@@ -14,12 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
-
 @CrossOrigin
 @RestController(KonsignConstant.CONTROLLER_API_PREFIX)
 public class BillController {
 
-    private final static Logger LOG = LoggerFactory.getLogger(BillController.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BillController.class.getName());
 
     private final BillService billService;
 
@@ -88,6 +87,4 @@ public class BillController {
         }
         return new ResponseEntity<>(responseVerdict, HttpStatus.OK);
     }
-
-
 }

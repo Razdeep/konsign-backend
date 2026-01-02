@@ -22,7 +22,8 @@ public class MasterController {
     private final TransportService transportService;
 
     @Autowired
-    public MasterController(SupplierService supplierService, BuyerService buyerService, TransportService transportService) {
+    public MasterController(
+            SupplierService supplierService, BuyerService buyerService, TransportService transportService) {
         this.supplierService = supplierService;
         this.buyerService = buyerService;
         this.transportService = transportService;

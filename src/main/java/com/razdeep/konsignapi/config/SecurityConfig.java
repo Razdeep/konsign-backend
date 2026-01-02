@@ -1,6 +1,8 @@
 package com.razdeep.konsignapi.config;
 
 import com.razdeep.konsignapi.filter.JwtFilter;
+import java.util.Arrays;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,13 +17,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
 
     private final JwtFilter jwtFilter;
     private final UserDetailsService userDetailsService;
@@ -38,12 +36,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.csrf()
+                .disable()
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/authenticate", "/register", "/refreshtoken", "/actuator/**").permitAll()
-                .antMatchers("/**").hasRole("USER")
+                .antMatchers("/authenticate", "/register", "/refreshtoken", "/actuator/**")
+                .permitAll()
+                .antMatchers("/**")
+                .hasRole("USER")
                 .and()
                 .httpBasic()
                 .and()

@@ -2,10 +2,9 @@ package com.razdeep.konsignapi.config;
 
 import com.google.gson.Gson;
 import com.razdeep.konsignapi.model.CustomPageImpl;
+import java.io.UnsupportedEncodingException;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
-
-import java.io.UnsupportedEncodingException;
 
 public class GsonRedisSerializer implements RedisSerializer {
     Gson gson = null;

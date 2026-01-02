@@ -3,14 +3,13 @@ package com.razdeep.konsignapi.service;
 import com.razdeep.konsignapi.entity.BuyerEntity;
 import com.razdeep.konsignapi.model.Buyer;
 import com.razdeep.konsignapi.repository.BuyerRepository;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class BuyerService {
@@ -28,7 +27,6 @@ public class BuyerService {
         this.commonService = commonService;
     }
 
-
     public List<Buyer> getBuyers() {
         String agencyId = commonService.getAgencyId();
         return self.getBuyersByAgencyId(agencyId);
@@ -45,11 +43,12 @@ public class BuyerService {
         return buyerRepository.findById(buyerId).isPresent();
     }
 
-
     @CacheEvict(value = "getBuyers", allEntries = true)
     public boolean addBuyer(Buyer buyer) {
         String agencyId = commonService.getAgencyId();
-        if (!buyerRepository.findAllBuyerByBuyerNameAndAgencyId(buyer.getBuyerName(), agencyId).isEmpty()) {
+        if (!buyerRepository
+                .findAllBuyerByBuyerNameAndAgencyId(buyer.getBuyerName(), agencyId)
+                .isEmpty()) {
             return false;
         }
 
@@ -75,7 +74,8 @@ public class BuyerService {
     @CacheEvict(value = "getBuyers", allEntries = true)
     public boolean deleteBuyer(String buyerId) {
         String agencyId = commonService.getAgencyId();
-        boolean wasPresent = buyerRepository.findByBuyerIdAndAgencyId(buyerId, agencyId).isPresent();
+        boolean wasPresent =
+                buyerRepository.findByBuyerIdAndAgencyId(buyerId, agencyId).isPresent();
         if (wasPresent) {
             buyerRepository.deleteById(buyerId);
         }

@@ -4,6 +4,14 @@ import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.service.JwtUtilService;
 import com.razdeep.konsignapi.service.KonsignUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +23,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -40,7 +39,11 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
+            throws ServletException, IOException {
 
         String extractedJwtToken = null;
         try {
@@ -81,9 +84,11 @@ public class JwtFilter extends OncePerRequestFilter {
             }
             String extractedRefreshToken = refreshTokenOptional.get();
             // allow for Refresh Token creation if following conditions are true.
-            if (isRefreshToken != null && isRefreshToken.equals("true") && requestURL.contains("refreshtoken")
-                && jwtUtilService.validateToken(extractedRefreshToken, null)) {
-//                allowForRefreshToken(ex, request);
+            if (isRefreshToken != null
+                    && isRefreshToken.equals("true")
+                    && requestURL.contains("refreshtoken")
+                    && jwtUtilService.validateToken(extractedRefreshToken, null)) {
+                //                allowForRefreshToken(ex, request);
                 // TODO: Hack fix this later
                 allowForRefreshToken(null, request);
                 filterChain.doFilter(request, response);
@@ -102,12 +107,10 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
-                = new UsernamePasswordAuthenticationToken(konsignUserDetails, null,
-                konsignUserDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(konsignUserDetails, null, konsignUserDetails.getAuthorities());
 
-        usernamePasswordAuthenticationToken.setDetails(
-                new WebAuthenticationDetailsSource().buildDetails(request));
+        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         filterChain.doFilter(request, response);
@@ -115,10 +118,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private void allowForRefreshToken(ExpiredJwtException ex, HttpServletRequest request) {
 
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                null, null, null);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                new UsernamePasswordAuthenticationToken(null, null, null);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-//        request.setAttribute("claims", ex.getClaims());
+        //        request.setAttribute("claims", ex.getClaims());
 
     }
 }

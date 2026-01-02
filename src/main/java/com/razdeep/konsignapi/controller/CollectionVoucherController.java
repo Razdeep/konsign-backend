@@ -8,15 +8,14 @@ import com.razdeep.konsignapi.model.PendingBill;
 import com.razdeep.konsignapi.service.BuyerService;
 import com.razdeep.konsignapi.service.CollectionVoucherService;
 import io.micrometer.core.annotation.Timed;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController(KonsignConstant.CONTROLLER_API_PREFIX)
 public class CollectionVoucherController {
@@ -27,12 +26,12 @@ public class CollectionVoucherController {
     private final BuyerService buyerService;
 
     @Autowired
-    public CollectionVoucherController(Gson gson, CollectionVoucherService collectionVoucherService, BuyerService buyerService) {
+    public CollectionVoucherController(
+            Gson gson, CollectionVoucherService collectionVoucherService, BuyerService buyerService) {
         this.gson = gson;
         this.collectionVoucherService = collectionVoucherService;
         this.buyerService = buyerService;
     }
-
 
     @Timed
     @GetMapping("/collection-vouchers")
@@ -78,8 +77,8 @@ public class CollectionVoucherController {
 
     @Timed
     @GetMapping(value = "/collection-vouchers/pending-bills", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Map<String, Object>> getPendingBillsToBeCollected(@RequestParam(required = false) String buyerId,
-                                                              @RequestParam(required = false) String buyerName) {
+    ResponseEntity<Map<String, Object>> getPendingBillsToBeCollected(
+            @RequestParam(required = false) String buyerId, @RequestParam(required = false) String buyerName) {
         List<PendingBill> pendingBills;
         if (buyerId != null && !buyerId.isEmpty()) {
             pendingBills = collectionVoucherService.getPendingBillsToBeCollected(buyerId);

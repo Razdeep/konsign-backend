@@ -15,13 +15,16 @@ public class AuthenticationService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public AuthenticationService(KonsignUserRepository konsignUserRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AuthenticationService(
+            KonsignUserRepository konsignUserRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.konsignUserRepository = konsignUserRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public void register(UserRegistration userRegistration) throws UsernameAlreadyExists {
-        if (konsignUserRepository.findKonsignUserByUsername(userRegistration.getUsername()).isPresent()) {
+        if (konsignUserRepository
+                .findKonsignUserByUsername(userRegistration.getUsername())
+                .isPresent()) {
             throw new UsernameAlreadyExists();
         }
         KonsignUser konsignUser = new KonsignUser(userRegistration);
