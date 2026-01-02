@@ -1,8 +1,5 @@
 spring:
   datasource:
-#    url: jdbc:mysql://localhost:3306/konsign
-#    username: konsign
-#    password: konsign
       url: jdbc:postgresql://localhost:5432/konsign
       username: konsign
       password: konsign
