@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "User")
+@Table(name = "app_user")
 @Getter
 @Setter
 public class KonsignUser extends BaseTimestamp {

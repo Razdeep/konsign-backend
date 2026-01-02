@@ -39,7 +39,6 @@ dependencies {
     implementation(libs.jjwt)
     implementation(libs.jaxb.api)
     implementation(libs.spring.boot.starter.data.jpa)
-//    implementation(libs.mysql.connector)
     implementation(libs.postgres.connector)
     implementation(libs.gson)
 
