@@ -1,5 +1,6 @@
 package com.razdeep.konsignapi.config;
 
+import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.filter.JwtFilter;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +42,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/authenticate", "/register", "/refreshtoken", "/actuator/**")
+                .antMatchers(
+                        KonsignConstant.CONTROLLER_API_PREFIX + "/authenticate",
+                        KonsignConstant.CONTROLLER_API_PREFIX + "/register",
+                        KonsignConstant.CONTROLLER_API_PREFIX + "/refreshtoken",
+                        "/actuator/**")
                 .permitAll()
                 .antMatchers("/**")
                 .hasRole("USER")
