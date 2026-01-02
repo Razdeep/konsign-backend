@@ -1,5 +1,6 @@
 package com.razdeep.konsignapi;
 
+import java.util.TimeZone;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class KonsignApiApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
         SpringApplication.run(KonsignApiApplication.class, args);
     }
 

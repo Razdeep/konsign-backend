@@ -3,6 +3,7 @@ springboot = "3.0.6"
 jjwt = "0.9.1"
 jaxb = "2.4.0-b180830.0359"
 mysql = "8.0.30"
+postgres = "42.7.8"
 gson = "2.10"
 lombok = "1.18.30" # put actual version you use
 mapstruct = "1.5.3.Final"
@@ -24,6 +25,7 @@ spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-star
 jjwt = { module = "io.jsonwebtoken:jjwt", version.ref = "jjwt" }
 jaxb-api = { module = "javax.xml.bind:jaxb-api", version.ref = "jaxb" }
 mysql-connector = { module = "mysql:mysql-connector-java", version.ref = "mysql" }
+postgres-connector = { module = "org.postgresql:postgresql", version.ref = "postgres" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 

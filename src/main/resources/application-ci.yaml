@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/konsign
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: create

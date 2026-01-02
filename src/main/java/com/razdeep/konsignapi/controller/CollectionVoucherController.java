@@ -17,7 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
+@RestController
+@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX)
 public class CollectionVoucherController {
 
     private final Gson gson;
