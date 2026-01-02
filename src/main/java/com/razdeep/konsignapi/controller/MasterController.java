@@ -14,7 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
+@RestController
+@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX)
 public class MasterController {
 
     private final SupplierService supplierService;

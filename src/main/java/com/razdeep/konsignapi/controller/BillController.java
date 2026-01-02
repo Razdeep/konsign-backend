@@ -15,7 +15,8 @@ import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
-@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
+@RestController
+@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX)
 public class BillController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BillController.class.getName());

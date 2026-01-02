@@ -6,7 +6,7 @@ spring:
       ddl-auto: none
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
         format_sql: true
     show-sql: false
   main:

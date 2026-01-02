@@ -30,7 +30,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
-@RestController(KonsignConstant.CONTROLLER_API_PREFIX)
+@RestController
+@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX)
 public class AuthenticationController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
