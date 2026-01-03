@@ -81,7 +81,7 @@ graalvmNative {
     binaries {
         named("main") {
             imageName.set("myapp")
-            mainClass.set("com.example.konsign.KonsignApiApplication")
+            mainClass.set("com.razdeep.konsignapi.KonsignApiApplication")
         }
     }
 }
