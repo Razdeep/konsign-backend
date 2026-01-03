@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX)
+@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX + "/bills")
 public class BillController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BillController.class.getName());
@@ -29,7 +29,7 @@ public class BillController {
     }
 
     @Timed
-    @PostMapping(value = "/bills")
+    @PostMapping(value = "/")
     public ResponseEntity<ResponseVerdict> addBillEntry(@RequestBody Bill bill) {
         ResponseEntity<ResponseVerdict> response;
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -48,7 +48,7 @@ public class BillController {
     }
 
     @Timed
-    @GetMapping(value = "/bills")
+    @GetMapping(value = "/")
     public ResponseEntity<ResponseVerdict> getBill(@RequestParam(name = "billNo") String billNo) {
         val bill = billService.getBill(billNo);
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -61,7 +61,7 @@ public class BillController {
     }
 
     @Timed
-    @GetMapping(value = "/bills/{offset}/{pageSize}")
+    @GetMapping(value = "/{offset}/{pageSize}")
     public ResponseEntity<ResponseVerdict> getAllBills(@PathVariable int offset, @PathVariable int pageSize) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -78,7 +78,7 @@ public class BillController {
     }
 
     @Timed
-    @DeleteMapping(value = "/bills")
+    @DeleteMapping(value = "/")
     public ResponseEntity<ResponseVerdict> deleteBill(@RequestParam(name = "billNo") String billNo) {
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (billService.deleteBill(billNo)) {
