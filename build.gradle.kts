@@ -5,17 +5,18 @@ plugins {
     id("java")
     id("com.diffplug.spotless") version "8.1.0"
     id("org.openrewrite.rewrite") version "7.23.0"
+    id("org.graalvm.buildtools.native") version "0.9.20"
 }
 
 group = "com.razdeep"
 version = "0.0.1-SNAPSHOT"
 description = "konsign-api"
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
+//java {
+//    toolchain {
+//        languageVersion.set(JavaLanguageVersion.of(17))
+//    }
+//}
 
 repositories {
     mavenCentral()
@@ -74,4 +75,13 @@ tasks.test {
 
 rewrite {
     activeRecipe("org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("myapp")
+            mainClass.set("com.example.konsign.KonsignApiApplication")
+        }
+    }
 }
