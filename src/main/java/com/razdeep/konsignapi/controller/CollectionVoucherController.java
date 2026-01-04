@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX)
+@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX + "/collection-vouchers")
 public class CollectionVoucherController {
 
     private final Gson gson;
@@ -35,7 +35,7 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @GetMapping("/collection-vouchers")
+    @GetMapping("/")
     public ResponseEntity<String> getCollectionVoucher(@RequestParam("voucherNo") String voucherNo) {
         ResponseEntity<String> response;
         CollectionVoucher collectionVoucher = collectionVoucherService.getVoucherByVoucherNo(voucherNo);
@@ -48,7 +48,7 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @PostMapping("/collection-vouchers")
+    @PostMapping("/")
     public ResponseEntity<String> addCollectionVoucher(@RequestBody CollectionVoucher collectionVoucher) {
         Map<String, String> body = new HashMap<>();
         ResponseEntity<String> response;
@@ -63,7 +63,7 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @DeleteMapping("/collection-vouchers/{voucherNo}")
+    @DeleteMapping("/{voucherNo}")
     ResponseEntity<String> deleteBuyer(@PathVariable String voucherNo) {
         String message;
         if (collectionVoucherService.deleteVoucher(voucherNo)) {
@@ -77,7 +77,7 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @GetMapping(value = "/collection-vouchers/pending-bills", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/pending-bills", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Map<String, Object>> getPendingBillsToBeCollected(
             @RequestParam(required = false) String buyerId, @RequestParam(required = false) String buyerName) {
         List<PendingBill> pendingBills;

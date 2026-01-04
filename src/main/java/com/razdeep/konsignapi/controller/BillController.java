@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX)
+@RequestMapping(KonsignConstant.CONTROLLER_API_PREFIX + "/bills")
 public class BillController {
 
     private static final Logger LOG = LoggerFactory.getLogger(BillController.class.getName());
@@ -29,7 +29,7 @@ public class BillController {
     }
 
     @Timed
-    @PostMapping(value = "/bills")
+    @PostMapping
     public ResponseEntity<ResponseVerdict> addBillEntry(@RequestBody Bill bill) {
         ResponseEntity<ResponseVerdict> response;
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -48,7 +48,7 @@ public class BillController {
     }
 
     @Timed
-    @GetMapping(value = "/bills")
+    @GetMapping
     public ResponseEntity<ResponseVerdict> getBill(@RequestParam(name = "billNo") String billNo) {
         val bill = billService.getBill(billNo);
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -61,13 +61,13 @@ public class BillController {
     }
 
     @Timed
-    @GetMapping(value = "/bills/{offset}/{pageSize}")
+    @GetMapping(value = "/{offset}/{pageSize}")
     public ResponseEntity<ResponseVerdict> getAllBills(@PathVariable int offset, @PathVariable int pageSize) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         val bills = billService.getAllBills(offset, pageSize);
         stopWatch.stop();
-        LOG.info("billEntryService.getAllBills() took " + stopWatch.getLastTaskTimeMillis() + " ms");
+        LOG.info("billEntryService.getAllBills() took {} ms", stopWatch.getLastTaskTimeMillis());
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (bills == null) {
             responseVerdict.setMessage("Bill not found");
@@ -78,8 +78,8 @@ public class BillController {
     }
 
     @Timed
-    @DeleteMapping(value = "/bills")
-    public ResponseEntity<ResponseVerdict> deleteBill(@RequestParam(name = "billNo") String billNo) {
+    @DeleteMapping("/{billNo}")
+    public ResponseEntity<ResponseVerdict> deleteBill(@PathVariable String billNo) {
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (billService.deleteBill(billNo)) {
             responseVerdict.setMessage("Successfully deleted bill " + billNo);
