@@ -5,7 +5,6 @@ import com.razdeep.konsignapi.model.Buyer;
 import com.razdeep.konsignapi.repository.BuyerRepository;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,7 +20,6 @@ public class BuyerService {
 
     private final CommonService commonService;
 
-    @Autowired
     public BuyerService(BuyerRepository buyerRepository, CommonService commonService) {
         this.buyerRepository = buyerRepository;
         this.commonService = commonService;
@@ -56,7 +54,7 @@ public class BuyerService {
             if (buyer.getBuyerName().isEmpty()) {
                 return false;
             }
-            val baseCandidateBuyerId = commonService.generateInitials(buyer.getBuyerName());
+            final var baseCandidateBuyerId = commonService.generateInitials(buyer.getBuyerName());
             String candidateBuyerId = baseCandidateBuyerId;
             int attempt = 2;
             while (isBuyerIdTaken(candidateBuyerId)) {
@@ -84,7 +82,7 @@ public class BuyerService {
 
     public BuyerEntity getBuyerByBuyerName(String buyerName) {
         String agencyId = commonService.getAgencyId();
-        val resultList = buyerRepository.findAllBuyerByBuyerNameAndAgencyId(buyerName, agencyId);
+        final var resultList = buyerRepository.findAllBuyerByBuyerNameAndAgencyId(buyerName, agencyId);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 }

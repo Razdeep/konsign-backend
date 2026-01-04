@@ -5,7 +5,6 @@ import com.razdeep.konsignapi.model.Transport;
 import com.razdeep.konsignapi.repository.TransportRepository;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,7 +20,6 @@ public class TransportService {
 
     private final CommonService commonService;
 
-    @Autowired
     public TransportService(TransportRepository transportRepository, CommonService commonService) {
         this.transportRepository = transportRepository;
         this.commonService = commonService;
@@ -45,7 +43,7 @@ public class TransportService {
             if (transport.getTransportName().isEmpty()) {
                 return false;
             }
-            val baseCandidateTransportId = commonService.generateInitials(transport.getTransportName());
+            final var baseCandidateTransportId = commonService.generateInitials(transport.getTransportName());
             String candidateTransportId = baseCandidateTransportId;
             int attempt = 2;
             while (isTransportIdTaken(candidateTransportId)) {
@@ -67,7 +65,7 @@ public class TransportService {
 
     public TransportEntity getTransportByTransportName(String transportName) {
         String agencyId = commonService.getAgencyId();
-        val resultList = transportRepository.findAllTransportByTransportNameAndAgencyId(transportName, agencyId);
+        final var resultList = transportRepository.findAllTransportByTransportNameAndAgencyId(transportName, agencyId);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 

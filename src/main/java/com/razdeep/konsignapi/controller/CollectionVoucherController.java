@@ -11,7 +11,6 @@ import io.micrometer.core.annotation.Timed;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +25,6 @@ public class CollectionVoucherController {
     private final CollectionVoucherService collectionVoucherService;
     private final BuyerService buyerService;
 
-    @Autowired
     public CollectionVoucherController(
             Gson gson, CollectionVoucherService collectionVoucherService, BuyerService buyerService) {
         this.gson = gson;
@@ -36,7 +34,7 @@ public class CollectionVoucherController {
 
     @Timed
     @GetMapping("/")
-    public ResponseEntity<String> getCollectionVoucher(@RequestParam("voucherNo") String voucherNo) {
+    public ResponseEntity<String> getCollectionVoucher(@RequestParam String voucherNo) {
         ResponseEntity<String> response;
         CollectionVoucher collectionVoucher = collectionVoucherService.getVoucherByVoucherNo(voucherNo);
         if (collectionVoucher == null) {

@@ -4,7 +4,6 @@ import com.razdeep.konsignapi.entity.KonsignUser;
 import com.razdeep.konsignapi.exception.UsernameAlreadyExists;
 import com.razdeep.konsignapi.model.UserRegistration;
 import com.razdeep.konsignapi.repository.KonsignUserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +13,6 @@ public class AuthenticationService {
     private final KonsignUserRepository konsignUserRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Autowired
     public AuthenticationService(
             KonsignUserRepository konsignUserRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.konsignUserRepository = konsignUserRepository;
