@@ -1,9 +1,10 @@
 plugins {
-    id("org.springframework.boot") version "2.7.4"
+    id("org.springframework.boot") version "3.0.13"
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("jvm") version "1.9.24" apply false // remove if not using Kotlin code
     id("java")
     id("com.diffplug.spotless") version "8.1.0"
+    id("org.openrewrite.rewrite") version "6.11.0"
 }
 
 group = "com.razdeep"
@@ -61,8 +62,14 @@ dependencies {
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.testcontainers)
     testImplementation(libs.testcontainers.mysql)
+
+    rewrite("org.openrewrite.recipe:rewrite-spring:5.10.0")
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+rewrite {
+    activeRecipe("org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0")
 }

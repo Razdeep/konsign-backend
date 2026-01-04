@@ -35,8 +35,8 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .authorizeRequests()
-                .antMatchers(
+                .authorizeHttpRequests()
+                .requestMatchers(
                         KonsignConstant.CONTROLLER_API_PREFIX + "/authenticate",
                         KonsignConstant.CONTROLLER_API_PREFIX + "/register",
                         KonsignConstant.CONTROLLER_API_PREFIX + "/refreshtoken",

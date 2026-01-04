@@ -11,16 +11,14 @@ import com.razdeep.konsignapi.service.AuthenticationService;
 import com.razdeep.konsignapi.service.JwtUtilService;
 import com.razdeep.konsignapi.service.KonsignUserDetailsService;
 import io.jsonwebtoken.impl.DefaultClaims;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Optional;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,7 +39,6 @@ public class AuthenticationController {
     private final JwtUtilService jwtUtilService;
     private final AuthenticationService authenticationService;
 
-    @Autowired
     public AuthenticationController(
             AuthenticationManager authenticationManager,
             KonsignUserDetailsService konsignUserDetailsService,
@@ -102,7 +99,7 @@ public class AuthenticationController {
         }
 
         String refreshToken = refreshTokenOptional.get();
-        LOG.info(String.format("refresh token: %s", refreshToken));
+        LOG.info("refresh token: %s".formatted(refreshToken));
 
         try {
             if (jwtUtilService.validateToken(refreshToken, null)) {
@@ -110,7 +107,7 @@ public class AuthenticationController {
                 // jwtUtilService.validateToken(jwtUtilService.extractAccessTokenFromRequest(request),
                 // null);
                 DefaultClaims claims = (DefaultClaims) request.getAttribute(KonsignConstant.HEADER_CLAIMS);
-                val claimsMap = jwtUtilService.getMapFromIoJsonWebTokenClaims(claims);
+                final var claimsMap = jwtUtilService.getMapFromIoJsonWebTokenClaims(claims);
                 String jwtToken = jwtUtilService.doGenerateRefreshToken(claimsMap, (String) claimsMap.get("sub"));
                 AuthenticationResponse authenticationResponse = new AuthenticationResponse();
                 authenticationResponse.setAccessToken(jwtToken);

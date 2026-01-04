@@ -5,10 +5,8 @@ import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.ResponseVerdict;
 import com.razdeep.konsignapi.service.BillService;
 import io.micrometer.core.annotation.Timed;
-import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StopWatch;
@@ -23,7 +21,6 @@ public class BillController {
 
     private final BillService billService;
 
-    @Autowired
     public BillController(BillService billService) {
         this.billService = billService;
     }
@@ -49,8 +46,8 @@ public class BillController {
 
     @Timed
     @GetMapping
-    public ResponseEntity<ResponseVerdict> getBill(@RequestParam(name = "billNo") String billNo) {
-        val bill = billService.getBill(billNo);
+    public ResponseEntity<ResponseVerdict> getBill(@RequestParam String billNo) {
+        final var bill = billService.getBill(billNo);
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (bill == null) {
             responseVerdict.setMessage("Bill not found");
@@ -65,7 +62,7 @@ public class BillController {
     public ResponseEntity<ResponseVerdict> getAllBills(@PathVariable int offset, @PathVariable int pageSize) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        val bills = billService.getAllBills(offset, pageSize);
+        final var bills = billService.getAllBills(offset, pageSize);
         stopWatch.stop();
         LOG.info("billEntryService.getAllBills() took {} ms", stopWatch.getLastTaskTimeMillis());
         ResponseVerdict responseVerdict = new ResponseVerdict();

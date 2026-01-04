@@ -5,7 +5,6 @@ import com.razdeep.konsignapi.model.Supplier;
 import com.razdeep.konsignapi.repository.SupplierRepository;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,7 +20,6 @@ public class SupplierService {
 
     private final CommonService commonService;
 
-    @Autowired
     public SupplierService(SupplierRepository supplierRepository, CommonService commonService) {
         this.supplierRepository = supplierRepository;
         this.commonService = commonService;
@@ -59,7 +57,7 @@ public class SupplierService {
             if (supplier.getSupplierName().isEmpty()) {
                 return false;
             }
-            val baseCandidateSupplierId = commonService.generateInitials(supplier.getSupplierName());
+            final var baseCandidateSupplierId = commonService.generateInitials(supplier.getSupplierName());
             String candidateSupplierId = baseCandidateSupplierId;
             int attempt = 2;
             while (isSupplierIdTaken(candidateSupplierId)) {
@@ -87,7 +85,7 @@ public class SupplierService {
 
     public SupplierEntity getSupplierBySupplierName(String supplierName) {
         String agencyId = commonService.getAgencyId();
-        val resultList = supplierRepository.findAllSupplierBySupplierNameAndAgencyId(supplierName, agencyId);
+        final var resultList = supplierRepository.findAllSupplierBySupplierNameAndAgencyId(supplierName, agencyId);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 }

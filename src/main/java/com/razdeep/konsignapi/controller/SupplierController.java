@@ -5,7 +5,6 @@ import com.razdeep.konsignapi.model.ResponseVerdict;
 import com.razdeep.konsignapi.model.Supplier;
 import com.razdeep.konsignapi.service.SupplierService;
 import io.micrometer.core.annotation.Timed;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,6 @@ public class SupplierController {
 
     private final SupplierService supplierService;
 
-    @Autowired
     public SupplierController(SupplierService supplierService) {
         this.supplierService = supplierService;
     }

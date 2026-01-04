@@ -1,11 +1,11 @@
 package com.razdeep.konsignapi.entity;
 
 import com.razdeep.konsignapi.model.Supplier;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;

@@ -10,11 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import lombok.val;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -38,7 +36,6 @@ public class BillService {
     private final CommonService commonService;
     private final BillEntryRepository billEntryRepository;
 
-    @Autowired
     public BillService(
             BuyerService buyerService,
             SupplierService supplierService,
@@ -103,11 +100,11 @@ public class BillService {
     @Cacheable(value = "getBill", key = "#billNo.concat(#agencyId)")
     public Bill getBill(String billNo, String agencyId) {
 
-        val billEntryOptional = billEntryRepository.findByBillNoAndAgencyId(billNo, agencyId);
+        final var billEntryOptional = billEntryRepository.findByBillNoAndAgencyId(billNo, agencyId);
         if (billEntryOptional.isEmpty()) {
             return null;
         }
-        val billEntry = billEntryOptional.get();
+        final var billEntry = billEntryOptional.get();
 
         List<LrPm> lrPmList = billEntry.getLrPmEntityList().stream()
                 .map((lrPmEntity -> new LrPm(lrPmEntity.getLr(), lrPmEntity.getPm())))
@@ -147,9 +144,9 @@ public class BillService {
     }
 
     public BillEntity convertBillIntoBillEntity(Bill bill) {
-        val targetSupplierEntity = supplierService.getSupplierBySupplierName(bill.getSupplierName());
-        val targetBuyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
-        val targetTransportEntity = transportService.getTransportByTransportName(bill.getTransportName());
+        final var targetSupplierEntity = supplierService.getSupplierBySupplierName(bill.getSupplierName());
+        final var targetBuyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
+        final var targetTransportEntity = transportService.getTransportByTransportName(bill.getTransportName());
         List<LrPmEntity> targetLrPmEntityList = new ArrayList<>();
         if (bill.getLrPmList() != null) {
             targetLrPmEntityList =
@@ -177,17 +174,17 @@ public class BillService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Pageable pageable = PageRequest.of(offset, size, Sort.by("billNo").descending());
-        val billEntityPages = billEntryRepository.findByAgencyId(agencyId, pageable);
+        final var billEntityPages = billEntryRepository.findByAgencyId(agencyId, pageable);
         stopWatch.stop();
         LOG.info("repository call took {} ms", stopWatch.getLastTaskTimeMillis());
 
         stopWatch.start();
-        val billList = billEntityPages.stream().map(Bill::new).collect(Collectors.toList());
+        final var billList = billEntityPages.stream().map(Bill::new).collect(Collectors.toList());
         stopWatch.stop();
         LOG.info("repository stream api conversion took {} ms", stopWatch.getLastTaskTimeMillis());
 
-        val pageNumber = billEntityPages.getPageable().getPageNumber();
-        val pageSize = billEntityPages.getPageable().getPageSize();
+        final var pageNumber = billEntityPages.getPageable().getPageNumber();
+        final var pageSize = billEntityPages.getPageable().getPageSize();
 
         return new CustomPageImpl<Bill>(billList, pageNumber, pageSize, billEntityPages.getTotalElements());
     }

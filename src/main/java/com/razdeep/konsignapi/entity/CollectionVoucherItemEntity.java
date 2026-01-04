@@ -1,7 +1,7 @@
 package com.razdeep.konsignapi.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
-import javax.persistence.*;
 import lombok.*;
 
 @Entity
