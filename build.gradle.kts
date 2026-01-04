@@ -1,10 +1,10 @@
 plugins {
     id("org.springframework.boot") version "3.0.13"
-    id("io.spring.dependency-management") version "1.1.6"
+    id("io.spring.dependency-management") version "1.1.7"
     kotlin("jvm") version "1.9.24" apply false // remove if not using Kotlin code
     id("java")
     id("com.diffplug.spotless") version "8.1.0"
-    id("org.openrewrite.rewrite") version "6.11.0"
+    id("org.openrewrite.rewrite") version "7.23.0"
 }
 
 group = "com.razdeep"
@@ -49,6 +49,8 @@ dependencies {
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
 
+    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.springdoc.openapi.ui)
 
@@ -63,7 +65,7 @@ dependencies {
     testImplementation(libs.testcontainers)
     testImplementation(libs.testcontainers.mysql)
 
-    rewrite("org.openrewrite.recipe:rewrite-spring:5.10.0")
+    rewrite(libs.openrewrite.recipe.rewrite.spring)
 }
 
 tasks.test {

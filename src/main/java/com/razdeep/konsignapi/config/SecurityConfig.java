@@ -16,6 +16,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -28,23 +30,20 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf()
-                .disable()
-                .cors()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeHttpRequests()
-                .requestMatchers(
-                        KonsignConstant.CONTROLLER_API_PREFIX + "/authenticate",
-                        KonsignConstant.CONTROLLER_API_PREFIX + "/register",
-                        KonsignConstant.CONTROLLER_API_PREFIX + "/refreshtoken",
-                        "/actuator/**")
-                .permitAll()
-                .anyRequest()
-                .hasRole("USER")
-                .and()
+        http.csrf(csrf -> csrf
+                .disable())
+                .cors(withDefaults())
+                .sessionManagement(management -> management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers(
+                                KonsignConstant.CONTROLLER_API_PREFIX + "/authenticate",
+                                KonsignConstant.CONTROLLER_API_PREFIX + "/register",
+                                KonsignConstant.CONTROLLER_API_PREFIX + "/refreshtoken",
+                                "/actuator/**")
+                        .permitAll()
+                        .anyRequest()
+                        .hasRole("USER"))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

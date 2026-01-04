@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import lombok.val;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -146,11 +145,11 @@ public class CollectionVoucherService {
 
         final var collectionVoucherItemList = collectionVoucherEntity.getCollectionVoucherItemEntityList().stream()
                 .map(collectionVoucherItemEntity -> {
-                    val billNo = collectionVoucherItemEntity.getBill().getBillNo();
+                    final var billNo = collectionVoucherItemEntity.getBill().getBillNo();
                     Bill bill = billService.getBill(billNo);
-                    val supplierName = bill.getSupplierName();
-                    val billAmount = bill.getBillAmount();
-                    val pendingBillAmount = billAmount - getCollectedAmountForBillNo(billNo);
+                    final var supplierName = bill.getSupplierName();
+                    final var billAmount = bill.getBillAmount();
+                    final var pendingBillAmount = billAmount - getCollectedAmountForBillNo(billNo);
                     return CollectionVoucherItem.builder()
                             .billNo(billNo)
                             .supplierName(supplierName)
