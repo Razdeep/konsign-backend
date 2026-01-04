@@ -29,7 +29,7 @@ public class BillController {
     }
 
     @Timed
-    @PostMapping(value = "/")
+    @PostMapping
     public ResponseEntity<ResponseVerdict> addBillEntry(@RequestBody Bill bill) {
         ResponseEntity<ResponseVerdict> response;
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -48,7 +48,7 @@ public class BillController {
     }
 
     @Timed
-    @GetMapping(value = "/")
+    @GetMapping
     public ResponseEntity<ResponseVerdict> getBill(@RequestParam(name = "billNo") String billNo) {
         val bill = billService.getBill(billNo);
         ResponseVerdict responseVerdict = new ResponseVerdict();
@@ -67,7 +67,7 @@ public class BillController {
         stopWatch.start();
         val bills = billService.getAllBills(offset, pageSize);
         stopWatch.stop();
-        LOG.info("billEntryService.getAllBills() took " + stopWatch.getLastTaskTimeMillis() + " ms");
+        LOG.info("billEntryService.getAllBills() took {} ms", stopWatch.getLastTaskTimeMillis());
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (bills == null) {
             responseVerdict.setMessage("Bill not found");
@@ -78,8 +78,8 @@ public class BillController {
     }
 
     @Timed
-    @DeleteMapping(value = "/")
-    public ResponseEntity<ResponseVerdict> deleteBill(@RequestParam(name = "billNo") String billNo) {
+    @DeleteMapping("/{billNo}")
+    public ResponseEntity<ResponseVerdict> deleteBill(@PathVariable String billNo) {
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (billService.deleteBill(billNo)) {
             responseVerdict.setMessage("Successfully deleted bill " + billNo);
