@@ -59,7 +59,8 @@ public class BillController {
 
     @Timed
     @GetMapping
-    public ResponseEntity<ResponseVerdict> getAllBills(@RequestParam int offset, @RequestParam int pageSize) {
+    public ResponseEntity<ResponseVerdict> getAllBills(
+            @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "5") int pageSize) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         final var bills = billService.getAllBills(offset, pageSize);

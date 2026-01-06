@@ -54,6 +54,8 @@ public class BillService {
     //            })
     public boolean enterBill(Bill bill) {
 
+        final var agencyId = commonService.getAgencyId();
+
         BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
         SupplierEntity supplierEntity = supplierService.getSupplierBySupplierName(bill.getSupplierName());
         TransportEntity transportEntity = transportService.getTransportByTransportName(bill.getTransportName());
@@ -79,11 +81,13 @@ public class BillService {
                     LrPmEntity lrPmEntity = new LrPmEntity(lrPm);
                     lrPmEntity.setLrPmId(bill.getBillNo() + "_" + lr_pm_index.getAndIncrement());
                     lrPmEntity.setBillEntry(billEntity);
+                    lrPmEntity.setAgencyId(agencyId);
                     return lrPmEntity;
                 })
                 .collect(Collectors.toList());
 
         billEntity.setLrPmEntityList(lrPmEntityList);
+        billEntity.setAgencyId(agencyId);
 
         billEntryRepository.save(billEntity);
         return true;

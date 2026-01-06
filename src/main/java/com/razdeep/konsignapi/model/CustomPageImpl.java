@@ -3,7 +3,9 @@ package com.razdeep.konsignapi.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import lombok.Getter;
 
+@Getter
 public class CustomPageImpl<T> {
 
     int totalPages, number, size, numberOfElements;
@@ -11,30 +13,6 @@ public class CustomPageImpl<T> {
     long totalElements;
 
     List<T> content;
-
-    public int getTotalPages() {
-        return totalPages;
-    }
-
-    public long getTotalElements() {
-        return totalElements;
-    }
-
-    public int getNumber() {
-        return number;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public int getNumberOfElements() {
-        return numberOfElements;
-    }
-
-    public List<T> getContent() {
-        return content;
-    }
 
     public boolean hasContent() {
         return content != null && !content.isEmpty();
