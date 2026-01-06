@@ -5,16 +5,10 @@ import com.razdeep.konsignapi.model.Transport;
 import com.razdeep.konsignapi.repository.TransportRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransportService {
-
-    @Autowired
-    private TransportService self;
 
     private final TransportRepository transportRepository;
 
@@ -29,7 +23,7 @@ public class TransportService {
         return transportRepository.findById(transportId).isPresent();
     }
 
-    @CacheEvict(value = "getTransports", allEntries = true)
+    //    @CacheEvict(value = "getTransports", allEntries = true)
     public boolean addTransport(Transport transport) {
         String agencyId = commonService.getAgencyId();
 
@@ -71,10 +65,10 @@ public class TransportService {
 
     public List<Transport> getTransports() {
         String agencyId = commonService.getAgencyId();
-        return self.getTransports(agencyId);
+        return getTransports(agencyId);
     }
 
-    @Cacheable(value = "getTransports", key = "#agencyId")
+    //    @Cacheable(value = "getTransports", key = "#agencyId")
     public List<Transport> getTransports(String agencyId) {
         List<Transport> result = new ArrayList<>();
         transportRepository
@@ -84,7 +78,7 @@ public class TransportService {
         return result;
     }
 
-    @CacheEvict(value = "getTransports", allEntries = true)
+    //    @CacheEvict(value = "getTransports", allEntries = true)
     public boolean deleteTransport(String transportId) {
         String agencyId = commonService.getAgencyId();
         boolean wasPresent = transportRepository

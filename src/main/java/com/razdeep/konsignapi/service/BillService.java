@@ -13,9 +13,7 @@ import java.util.stream.Collectors;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -50,11 +48,11 @@ public class BillService {
         this.billMapper = Mappers.getMapper(BillMapper.class);
     }
 
-    @Caching(
-            evict = {
-                @CacheEvict(value = "getAllBills", allEntries = true),
-                @CacheEvict(value = "getBill", key = "#bill.billNo")
-            })
+    //    @Caching(
+    //            evict = {
+    //                @CacheEvict(value = "getAllBills", allEntries = true),
+    //                @CacheEvict(value = "getBill", key = "#bill.billNo")
+    //            })
     public boolean enterBill(Bill bill) {
 
         BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
@@ -124,11 +122,11 @@ public class BillService {
         //        return billMapper.billEntityToBill(billEntry);
     }
 
-    @Caching(
-            evict = {
-                @CacheEvict(value = "getAllBills", allEntries = true),
-                @CacheEvict(value = "getBill", key = "#bill.billNo")
-            })
+    //    @Caching(
+    //            evict = {
+    //                @CacheEvict(value = "getAllBills", allEntries = true),
+    //                @CacheEvict(value = "getBill", key = "#bill.billNo")
+    //            })
     public boolean deleteBill(String billNo) {
         boolean wasPresent = false;
         if (billEntryRepository.findById(billNo).isPresent()) {
@@ -169,7 +167,7 @@ public class BillService {
         return getAllBills(offset, size, agencyId);
     }
 
-    @Cacheable(value = "getAllBills", key = "{#offset,#size,#agencyId}")
+    //    @Cacheable(value = "getAllBills", key = "{#offset,#size,#agencyId}")
     public CustomPageImpl<Bill> getAllBills(int offset, int size, String agencyId) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
