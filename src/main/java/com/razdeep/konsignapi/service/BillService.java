@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -95,7 +94,7 @@ public class BillService {
         return getBill(billNo, agencyId);
     }
 
-    @Cacheable(value = "getBill", key = "#billNo.concat(#agencyId)")
+    //    @Cacheable(value = "getBill", key = "#billNo.concat(#agencyId)")
     public Bill getBill(String billNo, String agencyId) {
 
         final var billEntryOptional = billEntryRepository.findByBillNoAndAgencyId(billNo, agencyId);
