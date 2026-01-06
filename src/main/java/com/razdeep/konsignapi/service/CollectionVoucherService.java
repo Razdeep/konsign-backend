@@ -23,14 +23,17 @@ public class CollectionVoucherService {
     private final CollectionVoucherRepository collectionVoucherRepository;
     private final BuyerService buyerService;
     private final BillService billService;
+    private final CommonService commonService;
 
     public CollectionVoucherService(
             CollectionVoucherRepository collectionVoucherRepository,
             BuyerService buyerService,
-            BillService billService) {
+            BillService billService,
+            CommonService commonService) {
         this.collectionVoucherRepository = collectionVoucherRepository;
         this.buyerService = buyerService;
         this.billService = billService;
+        this.commonService = commonService;
     }
 
     public boolean addCollectionVoucher(CollectionVoucher collectionVoucher) {
@@ -38,11 +41,15 @@ public class CollectionVoucherService {
             return false;
         }
 
+        final var agencyId = commonService.getAgencyId();
+
         CollectionVoucherEntity collectionVoucherEntity = CollectionVoucherEntity.builder()
                 .voucherNo(collectionVoucher.getVoucherNo())
                 .voucherDate(LocalDate.parse(collectionVoucher.getVoucherDate()))
                 .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
                 .build();
+
+        collectionVoucherEntity.setAgencyId(agencyId);
 
         //
         // collectionVoucherEntity.setCreationTimestamp(getVoucherByVoucherNo(collectionVoucher.getVoucherNo()));
@@ -56,7 +63,7 @@ public class CollectionVoucherService {
                     final var targetBilEntity = billService.convertBillIntoBillEntity(targetBill);
                     final var collectionVoucherItemId =
                             collectionVoucher.getVoucherNo() + "_" + collectionVoucherItemIndex.getAndIncrement();
-                    return CollectionVoucherItemEntity.builder()
+                    final var collectionVoucherItemEntity = CollectionVoucherItemEntity.builder()
                             .collectionVoucherItemId(collectionVoucherItemId)
                             .collectionVoucher(collectionVoucherEntity)
                             .bill(targetBilEntity)
@@ -65,6 +72,8 @@ public class CollectionVoucherService {
                             .ddNo(collectionVoucherItem.getDdNo())
                             .ddDate(LocalDate.parse(collectionVoucherItem.getDdDate()))
                             .build();
+                    collectionVoucherItemEntity.setAgencyId(agencyId);
+                    return collectionVoucherItemEntity;
                 })
                 .collect(Collectors.toList());
 
