@@ -5,16 +5,10 @@ import com.razdeep.konsignapi.model.Supplier;
 import com.razdeep.konsignapi.repository.SupplierRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SupplierService {
-
-    @Autowired
-    private SupplierService self;
 
     private final SupplierRepository supplierRepository;
 
@@ -31,10 +25,10 @@ public class SupplierService {
 
     public List<Supplier> getSuppliers() {
         String agencyId = commonService.getAgencyId();
-        return self.getSupplierByAgencyId(agencyId);
+        return getSupplierByAgencyId(agencyId);
     }
 
-    @Cacheable(value = "getSuppliers", key = "#agencyId")
+    //    @Cacheable(value = "getSuppliers", key = "#agencyId")
     public List<Supplier> getSupplierByAgencyId(String agencyId) {
         List<Supplier> result = new ArrayList<>();
         List<SupplierEntity> supplierEntityList = supplierRepository.findAllByAgencyId(agencyId);
@@ -45,7 +39,7 @@ public class SupplierService {
         return result;
     }
 
-    @CacheEvict(value = "getSuppliers", allEntries = true)
+    //    @CacheEvict(value = "getSuppliers", allEntries = true)
     public boolean addSupplier(Supplier supplier) {
         String agencyId = commonService.getAgencyId();
         if (!supplierRepository
@@ -71,7 +65,7 @@ public class SupplierService {
         return true;
     }
 
-    @CacheEvict(value = "getSuppliers", allEntries = true)
+    //    @CacheEvict(value = "getSuppliers", allEntries = true)
     public boolean deleteSupplier(String supplierId) {
         String agencyId = commonService.getAgencyId();
         boolean wasPresent = supplierRepository

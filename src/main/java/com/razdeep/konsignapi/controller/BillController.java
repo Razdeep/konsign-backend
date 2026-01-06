@@ -45,8 +45,8 @@ public class BillController {
     }
 
     @Timed
-    @GetMapping
-    public ResponseEntity<ResponseVerdict> getBill(@RequestParam String billNo) {
+    @GetMapping("/{billNo}")
+    public ResponseEntity<ResponseVerdict> getBill(@PathVariable String billNo) {
         final var bill = billService.getBill(billNo);
         ResponseVerdict responseVerdict = new ResponseVerdict();
         if (bill == null) {
@@ -58,8 +58,8 @@ public class BillController {
     }
 
     @Timed
-    @GetMapping(value = "/{offset}/{pageSize}")
-    public ResponseEntity<ResponseVerdict> getAllBills(@PathVariable int offset, @PathVariable int pageSize) {
+    @GetMapping
+    public ResponseEntity<ResponseVerdict> getAllBills(@RequestParam int offset, @RequestParam int pageSize) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         final var bills = billService.getAllBills(offset, pageSize);

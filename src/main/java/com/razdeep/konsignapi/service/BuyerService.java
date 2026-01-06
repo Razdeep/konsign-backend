@@ -5,16 +5,10 @@ import com.razdeep.konsignapi.model.Buyer;
 import com.razdeep.konsignapi.repository.BuyerRepository;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BuyerService {
-
-    @Autowired
-    private BuyerService self;
 
     private final BuyerRepository buyerRepository;
 
@@ -27,10 +21,10 @@ public class BuyerService {
 
     public List<Buyer> getBuyers() {
         String agencyId = commonService.getAgencyId();
-        return self.getBuyersByAgencyId(agencyId);
+        return getBuyersByAgencyId(agencyId);
     }
 
-    @Cacheable(value = "getBuyers", key = "#agencyId")
+    //    @Cacheable(value = "getBuyers", key = "#agencyId")
     public List<Buyer> getBuyersByAgencyId(String agencyId) {
         List<Buyer> result = new ArrayList<>();
         buyerRepository.findAllByAgencyId(agencyId).forEach((buyerEntity) -> result.add(new Buyer(buyerEntity)));
@@ -41,7 +35,7 @@ public class BuyerService {
         return buyerRepository.findById(buyerId).isPresent();
     }
 
-    @CacheEvict(value = "getBuyers", allEntries = true)
+    //    @CacheEvict(value = "getBuyers", allEntries = true)
     public boolean addBuyer(Buyer buyer) {
         String agencyId = commonService.getAgencyId();
         if (!buyerRepository
@@ -69,7 +63,7 @@ public class BuyerService {
         return true;
     }
 
-    @CacheEvict(value = "getBuyers", allEntries = true)
+    //    @CacheEvict(value = "getBuyers", allEntries = true)
     public boolean deleteBuyer(String buyerId) {
         String agencyId = commonService.getAgencyId();
         boolean wasPresent =

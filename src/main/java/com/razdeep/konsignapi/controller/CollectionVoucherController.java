@@ -33,8 +33,8 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @GetMapping("/")
-    public ResponseEntity<String> getCollectionVoucher(@RequestParam String voucherNo) {
+    @GetMapping("/{voucherNo}")
+    public ResponseEntity<String> getCollectionVoucher(@PathVariable String voucherNo) {
         ResponseEntity<String> response;
         CollectionVoucher collectionVoucher = collectionVoucherService.getVoucherByVoucherNo(voucherNo);
         if (collectionVoucher == null) {
@@ -46,7 +46,7 @@ public class CollectionVoucherController {
     }
 
     @Timed
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<String> addCollectionVoucher(@RequestBody CollectionVoucher collectionVoucher) {
         Map<String, String> body = new HashMap<>();
         ResponseEntity<String> response;
