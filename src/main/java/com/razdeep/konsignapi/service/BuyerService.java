@@ -91,7 +91,7 @@ public class BuyerService {
         String buyerName = buyerRepository.findBuyerNameByBuyerId(buyerId, agencyId);
         payload.put("buyerName", buyerName);
 
-        List<BillCollectionProjection> rows = buyerRepository.computeBuyerLedger();
+        List<BillCollectionProjection> rows = buyerRepository.computeBuyerLedger(buyerId, agencyId);
         List<BillCollectionDTO> items = rows.stream()
                 .map(rawRow -> new BillCollectionDTO(
                         rawRow.getBillNo(),

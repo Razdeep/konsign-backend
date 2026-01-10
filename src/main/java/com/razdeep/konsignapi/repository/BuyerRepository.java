@@ -31,7 +31,9 @@ select
 from
 	collection_voucher
 join collection_voucher_item on
-	voucher_no = fk_collection_voucher_id),
+	voucher_no = fk_collection_voucher_id
+where buyer_buyer_id = :buyerId
+and collection_voucher.agency_id = :agencyId),
 bill_joined as (
 select
 	*
@@ -58,5 +60,5 @@ join collection_joined
 on
 	bill_joined.bill_no = collection_joined.bill_bill_no;
             """, nativeQuery = true)
-    List<BillCollectionProjection> computeBuyerLedger();
+    List<BillCollectionProjection> computeBuyerLedger(@NonNull String buyerId, @NonNull String agencyId);
 }
