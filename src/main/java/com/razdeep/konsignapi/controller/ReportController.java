@@ -30,8 +30,8 @@ public class ReportController {
 
     @Timed
     @GetMapping("/buyer")
-    public ResponseEntity<byte[]> generateBuyerReport(@RequestParam String supplierId) throws Exception {
-        final var bytes = buyerService.generateBuyerLedger(supplierId);
+    public ResponseEntity<byte[]> generateBuyerReport(@RequestParam String buyerId) throws Exception {
+        final var bytes = buyerService.generateBuyerLedger(buyerId);
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(bytes);
     }
 }

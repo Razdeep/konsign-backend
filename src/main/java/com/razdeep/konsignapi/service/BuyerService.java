@@ -2,6 +2,8 @@ package com.razdeep.konsignapi.service;
 
 import com.razdeep.konsignapi.entity.BuyerEntity;
 import com.razdeep.konsignapi.model.Buyer;
+import com.razdeep.konsignapi.repository.BillCollectionDTO;
+import com.razdeep.konsignapi.repository.BillCollectionProjection;
 import com.razdeep.konsignapi.repository.BuyerRepository;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,9 +86,26 @@ public class BuyerService {
 
     public byte[] generateBuyerLedger(String buyerId) throws Exception {
         String agencyId = commonService.getAgencyId();
-        String buyerName = buyerRepository.findBuyerNameByBuyerId(buyerId, agencyId);
         Map<String, Object> payload = new HashMap<>();
+
+        String buyerName = buyerRepository.findBuyerNameByBuyerId(buyerId, agencyId);
         payload.put("buyerName", buyerName);
+
+        List<BillCollectionProjection> rows = buyerRepository.computeBuyerLedger();
+        List<BillCollectionDTO> items = rows.stream()
+                .map(rawRow -> new BillCollectionDTO(
+                        rawRow.getBillNo(),
+                        rawRow.getBillDate(),
+                        rawRow.getBillAmount(),
+                        rawRow.getSupplierName(),
+                        rawRow.getVoucherNo(),
+                        rawRow.getAmountCollected(),
+                        rawRow.getBank(),
+                        rawRow.getDdNo(),
+                        rawRow.getDdDate()))
+                .toList();
+        payload.put("items", items);
+
         return commonService.generatePdf("buyer.ftl", payload);
     }
 }

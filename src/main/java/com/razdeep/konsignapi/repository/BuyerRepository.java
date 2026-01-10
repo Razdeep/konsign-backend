@@ -24,27 +24,39 @@ public interface BuyerRepository extends JpaRepository<BuyerEntity, String> {
     """)
     String findBuyerNameByBuyerId(String buyerId, String agencyId);
 
-    //    @Query(value = """
-    //        SELECT
-    //            b.bill_no                      AS billNo,
-    //            b.bill_date                    AS billDate,
-    //            b.bill_amount                  AS billAmount,
-    //            s.supplier_name                AS supplierName,
-    //            cv.voucher_no                  AS voucherNo,
-    //            cvi.amount_collected           AS amountCollected,
-    //            cv.bank                        AS bank,
-    //            cv.dd_no                       AS ddNo,
-    //            cv.dd_date                     AS ddDate
-    //        FROM bill b
-    //        JOIN supplier s
-    //            ON s.supplier_id = b.supplier_id
-    //        JOIN collection_voucher cv
-    //            ON b.bill_no = cv.bill_bill_no
-    //        JOIN collection_voucher_item cvi
-    //            ON cv.voucher_no = cvi.fk_collection_voucher_id
-    //        """,
-    //            nativeQuery = true
-    //    )
-    //    List<BillCollectionProjection> computeBuyerLedger();
-
+    @Query(value = """
+with collection_joined as (
+select
+	*
+from
+	collection_voucher
+join collection_voucher_item on
+	voucher_no = fk_collection_voucher_id),
+bill_joined as (
+select
+	*
+from
+	bill
+join supplier on
+	bill.fk_supplier_id = supplier.supplier_id
+join buyer on
+	bill.fk_buyer_id = buyer.buyer_id
+)
+select
+	bill_joined.bill_no as billNo,
+	bill_joined.bill_date as billDate,
+	bill_joined.bill_amount as billAmount,
+	bill_joined.supplier_name as supplierName,
+	collection_joined.voucher_no as voucherNo,
+	collection_joined.amount_collected as amountCollected,
+	collection_joined.bank as bank,
+	collection_joined.dd_no as ddNo,
+	collection_joined.dd_date as ddDate
+from
+	bill_joined
+join collection_joined
+on
+	bill_joined.bill_no = collection_joined.bill_bill_no;
+            """, nativeQuery = true)
+    List<BillCollectionProjection> computeBuyerLedger();
 }

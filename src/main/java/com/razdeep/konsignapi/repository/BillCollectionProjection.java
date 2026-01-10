@@ -8,7 +8,7 @@ public interface BillCollectionProjection {
 
     LocalDate getBillDate();
 
-    Double getBillAmount();
+    String getBillAmount();
 
     String getSupplierName();
 
@@ -20,5 +20,5 @@ public interface BillCollectionProjection {
 
     String getDdNo();
 
-    String getDdDate();
+    LocalDate getDdDate();
 }
