@@ -12,6 +12,7 @@ jackson = "2.15.0"
 micrometer = "1.11.0" # adjust if needed
 testcontainers = "1.17.6"
 rewritespring = "6.21.0"
+openhtml = "1.0.10"
 
 [libraries]
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web" }
@@ -21,6 +22,7 @@ spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-
 spring-boot-starter-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis", version.ref = "springboot" }
 spring-boot-starter-cache = { module = "org.springframework.boot:spring-boot-starter-cache", version = "2.4.3" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-freemarker = { module = "org.springframework.boot:spring-boot-starter-freemarker" }
 
 jjwt = { module = "io.jsonwebtoken:jjwt", version.ref = "jjwt" }
 jaxb-api = { module = "javax.xml.bind:jaxb-api", version.ref = "jaxb" }
@@ -41,4 +43,6 @@ testcontainers = { module = "org.testcontainers:testcontainers", version.ref = "
 testcontainers-mysql = { module = "org.testcontainers:mysql", version.ref = "testcontainers" }
 
 openrewrite-recipe-rewrite-spring = { module = "org.openrewrite.recipe:rewrite-spring", version.ref = "rewritespring" }
+
+openhtml = { module = "com.openhtmltopdf:openhtmltopdf-pdfbox", version.ref = "openhtml"}
 
