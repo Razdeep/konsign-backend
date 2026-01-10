@@ -85,13 +85,12 @@ public class SupplierService {
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 
+    // TODO: implement properly later
     public byte[] generateSupplierLedger(String supplierId) throws Exception {
         String supplierName = supplierRepository.findSupplierNameBySupplierId(supplierId);
         Map<String, Object> payload = new HashMap<>();
         payload.put("supplierName", supplierName);
 
-        String html = commonService.generateHtml("supplier.ftl", payload);
-
-        return commonService.convertHtmlToPdf(html);
+        return commonService.generatePdf("supplier.ftl", payload);
     }
 }

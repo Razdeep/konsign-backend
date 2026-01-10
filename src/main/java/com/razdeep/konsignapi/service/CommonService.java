@@ -63,7 +63,7 @@ public class CommonService {
         return konsignUserDetails.getAgencyId();
     }
 
-    public byte[] convertHtmlToPdf(String html) throws Exception {
+    private byte[] convertHtmlToPdf(String html) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         PdfRendererBuilder builder = new PdfRendererBuilder();
@@ -80,11 +80,17 @@ public class CommonService {
         return out.toByteArray();
     }
 
-    public String generateHtml(String templateName, Map<String, Object> payload) throws IOException, TemplateException {
+    private String generateHtml(String templateName, Map<String, Object> payload)
+            throws IOException, TemplateException {
         Template template = freemarkerConfigurer.getConfiguration().getTemplate(templateName);
         StringWriter writer = new StringWriter();
         template.process(payload, writer);
 
         return writer.toString();
+    }
+
+    public byte[] generatePdf(String templateName, Map<String, Object> payload) throws Exception {
+        String html = generateHtml(templateName, payload);
+        return convertHtmlToPdf(html);
     }
 }

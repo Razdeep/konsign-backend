@@ -4,7 +4,9 @@ import com.razdeep.konsignapi.entity.BuyerEntity;
 import com.razdeep.konsignapi.model.Buyer;
 import com.razdeep.konsignapi.repository.BuyerRepository;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -78,5 +80,13 @@ public class BuyerService {
         String agencyId = commonService.getAgencyId();
         final var resultList = buyerRepository.findAllBuyerByBuyerNameAndAgencyId(buyerName, agencyId);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    public byte[] generateBuyerLedger(String buyerId) throws Exception {
+        String agencyId = commonService.getAgencyId();
+        String buyerName = buyerRepository.findBuyerNameByBuyerId(buyerId, agencyId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("buyerName", buyerName);
+        return commonService.generatePdf("buyer.ftl", payload);
     }
 }
