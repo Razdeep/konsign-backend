@@ -11,6 +11,11 @@ spring:
     show-sql: false
   main:
     allow-circular-references: true
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix: .ftl
+    charset: UTF-8
+    cache: false  # true in prod
 
 redis:
   host: ${REDIS_HOST}

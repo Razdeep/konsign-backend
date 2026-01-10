@@ -4,7 +4,9 @@ import com.razdeep.konsignapi.entity.SupplierEntity;
 import com.razdeep.konsignapi.model.Supplier;
 import com.razdeep.konsignapi.repository.SupplierRepository;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -81,5 +83,14 @@ public class SupplierService {
         String agencyId = commonService.getAgencyId();
         final var resultList = supplierRepository.findAllSupplierBySupplierNameAndAgencyId(supplierName, agencyId);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    // TODO: implement properly later
+    public byte[] generateSupplierLedger(String supplierId) throws Exception {
+        String supplierName = supplierRepository.findSupplierNameBySupplierId(supplierId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("supplierName", supplierName);
+
+        return commonService.generatePdf("supplier.ftl", payload);
     }
 }

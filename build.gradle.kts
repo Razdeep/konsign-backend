@@ -42,6 +42,8 @@ dependencies {
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.postgres.connector)
     implementation(libs.gson)
+    implementation(libs.spring.boot.starter.freemarker)
+    implementation(libs.openhtml)
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
