@@ -42,6 +42,8 @@ dependencies {
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.postgres.connector)
     implementation(libs.gson)
+    implementation("org.springframework.boot:spring-boot-starter-freemarker")
+    implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
