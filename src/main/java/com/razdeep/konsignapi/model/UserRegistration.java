@@ -16,5 +16,5 @@ public class UserRegistration {
     private String password;
 
     @NonNull
-    private String agencyId;
+    private String tenantId;
 }

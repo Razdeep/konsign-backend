@@ -3,20 +3,15 @@ package com.razdeep.konsignapi.filter;
 import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.service.JwtUtilService;
 import com.razdeep.konsignapi.service.KonsignUserDetailsService;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,83 +40,46 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
-        String extractedJwtToken = null;
+        if (SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        String token = jwtUtilService.extractAccessTokenFromRequest(request);
+        if (token == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
-            extractedJwtToken = jwtUtilService.extractAccessTokenFromRequest(request);
+            String username = jwtUtilService.extractUsername(token);
+
+            UserDetails userDetails = konsignUserDetailsService.loadUserByUsername(username);
+
+            if (!jwtUtilService.validateToken(token, userDetails)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
         } catch (Exception ex) {
-            ex.printStackTrace();
-            filterChain.doFilter(request, response);
-            return;
+            LOG.debug("JWT authentication failed: {}", ex.getMessage());
         }
 
-        UserDetails konsignUserDetails = null;
-        try {
-            if (!jwtUtilService.validateToken(extractedJwtToken, konsignUserDetails)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            String extractedUsername = jwtUtilService.extractUsername(extractedJwtToken);
-
-            konsignUserDetails = konsignUserDetailsService.loadUserByUsername(extractedUsername);
-
-            if (konsignUserDetails == null) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-        } catch (ExpiredJwtException | BadCredentialsException ex) {
-            ex.printStackTrace();
-            LOG.debug(ex.toString());
-            String isRefreshToken = request.getHeader("isRefreshToken");
-            String requestURL = request.getRequestURL().toString();
-            Optional<String> refreshTokenOptional = Arrays.stream(request.getCookies())
-                    .filter(cookie -> cookie.getName().equals(KonsignConstant.HEADER_REFRESH_TOKEN))
-                    .map(Cookie::getValue)
-                    .findAny();
-            if (refreshTokenOptional.isEmpty()) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-            String extractedRefreshToken = refreshTokenOptional.get();
-            // allow for Refresh Token creation if following conditions are true.
-            if (isRefreshToken != null
-                    && isRefreshToken.equals("true")
-                    && requestURL.contains("refreshtoken")
-                    && jwtUtilService.validateToken(extractedRefreshToken, null)) {
-                //                allowForRefreshToken(ex, request);
-                // TODO: Hack fix this later
-                allowForRefreshToken(null, request);
-                filterChain.doFilter(request, response);
-                return;
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            LOG.debug(ex.toString());
-            response.sendError(401, "Most probably credentials mismatch");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if (konsignUserDetails == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(konsignUserDetails, null, konsignUserDetails.getAuthorities());
-
-        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
         filterChain.doFilter(request, response);
     }
 
-    private void allowForRefreshToken(ExpiredJwtException ex, HttpServletRequest request) {
-
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(null, null, null);
-        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-        //        request.setAttribute("claims", ex.getClaims());
-
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith(KonsignConstant.CONTROLLER_API_PREFIX + "/auth")
+                || path.startsWith(KonsignConstant.CONTROLLER_API_PREFIX + "/health")
+                || path.startsWith(KonsignConstant.CONTROLLER_API_PREFIX + "/docs");
     }
 }

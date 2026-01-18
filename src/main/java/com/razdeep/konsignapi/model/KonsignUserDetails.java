@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +14,8 @@ public class KonsignUserDetails implements UserDetails {
     private final String username;
     private final String password;
 
-    private final String agencyId;
+    @Getter
+    private final String tenantId;
 
     private final boolean enabled;
     private final List<GrantedAuthority> authorities;
@@ -22,7 +24,7 @@ public class KonsignUserDetails implements UserDetails {
         username = konsignUser.getUsername();
         password = konsignUser.getPassword();
         enabled = konsignUser.isActive();
-        agencyId = konsignUser.getAgencyId();
+        tenantId = konsignUser.getTenantId();
         authorities = Arrays.stream(konsignUser.getRoles().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
@@ -61,9 +63,5 @@ public class KonsignUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public String getAgencyId() {
-        return agencyId;
     }
 }

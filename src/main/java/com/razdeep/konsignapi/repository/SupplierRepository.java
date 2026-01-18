@@ -10,11 +10,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SupplierRepository extends JpaRepository<SupplierEntity, String> {
 
-    List<SupplierEntity> findAllSupplierBySupplierNameAndAgencyId(String supplierName, String agencyId);
+    List<SupplierEntity> findAllSupplierBySupplierNameAndTenantId(String supplierName, String tenantId);
 
-    List<SupplierEntity> findAllByAgencyId(String supplierName);
+    List<SupplierEntity> findAllByTenantId(String supplierName);
 
-    Optional<SupplierEntity> findSupplierBySupplierIdAndAgencyId(String supplierId, String agencyId);
+    Optional<SupplierEntity> findSupplierBySupplierIdAndTenantId(String supplierId, String tenantId);
 
     @Query("""
         select s.supplierName

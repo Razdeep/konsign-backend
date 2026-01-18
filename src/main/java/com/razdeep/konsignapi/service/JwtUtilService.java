@@ -1,15 +1,18 @@
 package com.razdeep.konsignapi.service;
 
+import com.razdeep.konsignapi.entity.KonsignUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +53,17 @@ public class JwtUtilService {
 
     public String generateToken(UserDetails konsignUserDetails) {
         Map<String, Object> claims = new HashMap<>();
+        if (konsignUserDetails instanceof KonsignUser) {
+            claims.put("tenantId", ((KonsignUser) konsignUserDetails).getTenantId());
+        }
+
+        claims.put(
+                "roles",
+                konsignUserDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList());
+
+        claims.put("jti", UUID.randomUUID().toString());
         return createToken(claims, konsignUserDetails.getUsername());
     }
 
@@ -103,5 +117,16 @@ public class JwtUtilService {
         }
 
         return authorizationHeaderStr.substring(BEARER_KEYWORD.length());
+    }
+
+    public String extractTenantId(String token) {
+        Claims claims = extractAllClaims(token);
+
+        Object tenantClaim = claims.get("tenantId");
+        if (tenantClaim == null) {
+            return null;
+        }
+
+        return tenantClaim.toString();
     }
 }

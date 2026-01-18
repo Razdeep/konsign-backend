@@ -10,19 +10,19 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BuyerRepository extends JpaRepository<BuyerEntity, String> {
-    List<BuyerEntity> findAllBuyerByBuyerNameAndAgencyId(@NonNull String buyerName, @NonNull String agencyId);
+    List<BuyerEntity> findAllBuyerByBuyerNameAndTenantId(@NonNull String buyerName, @NonNull String tenantId);
 
-    List<BuyerEntity> findAllByAgencyId(@NonNull String agencyId);
+    List<BuyerEntity> findAllByTenantId(@NonNull String tenantId);
 
-    Optional<BuyerEntity> findByBuyerIdAndAgencyId(@NonNull String buyerId, @NonNull String agencyId);
+    Optional<BuyerEntity> findByBuyerIdAndTenantId(@NonNull String buyerId, @NonNull String tenantId);
 
     @Query("""
         select b.buyerName
         from BuyerEntity b
         where b.buyerId = :buyerId
-            and b.agencyId = :agencyId
+            and b.tenantId = :tenantId
     """)
-    String findBuyerNameByBuyerId(String buyerId, String agencyId);
+    String findBuyerNameByBuyerId(String buyerId, String tenantId);
 
     @Query(value = """
 with collection_joined as (
@@ -33,7 +33,7 @@ from
 join collection_voucher_item on
 	voucher_no = fk_collection_voucher_id
 where buyer_buyer_id = :buyerId
-and collection_voucher.agency_id = :agencyId),
+and collection_voucher.tenant_id = :tenantId),
 bill_joined as (
 select
 	*
@@ -60,5 +60,5 @@ join collection_joined
 on
 	bill_joined.bill_no = collection_joined.bill_bill_no;
             """, nativeQuery = true)
-    List<BillCollectionProjection> computeBuyerLedger(@NonNull String buyerId, @NonNull String agencyId);
+    List<BillCollectionProjection> computeBuyerLedger(@NonNull String buyerId, @NonNull String tenantId);
 }
