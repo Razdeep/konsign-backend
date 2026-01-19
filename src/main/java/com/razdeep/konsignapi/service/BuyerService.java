@@ -1,10 +1,10 @@
 package com.razdeep.konsignapi.service;
 
 import com.razdeep.konsignapi.entity.BuyerEntity;
+import com.razdeep.konsignapi.model.BillCollectionDTO;
 import com.razdeep.konsignapi.model.Buyer;
-import com.razdeep.konsignapi.repository.BillCollectionDTO;
-import com.razdeep.konsignapi.repository.BillCollectionProjection;
 import com.razdeep.konsignapi.repository.BuyerRepository;
+import com.razdeep.konsignapi.repository.projection.BillCollectionProjection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.razdeep.konsignapi.repository;
+package com.razdeep.konsignapi.model;
 
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,7 @@
 package com.razdeep.konsignapi.repository;
 
 import com.razdeep.konsignapi.entity.BuyerEntity;
+import com.razdeep.konsignapi.repository.projection.BillCollectionProjection;
 import java.util.List;
 import java.util.Optional;
 import lombok.NonNull;

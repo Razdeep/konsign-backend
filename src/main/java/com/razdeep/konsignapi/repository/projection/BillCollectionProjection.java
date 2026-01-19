@@ -1,4 +1,4 @@
-package com.razdeep.konsignapi.repository;
+package com.razdeep.konsignapi.repository.projection;
 
 import java.time.LocalDate;
 
