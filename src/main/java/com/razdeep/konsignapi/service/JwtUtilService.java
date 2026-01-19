@@ -1,5 +1,6 @@
 package com.razdeep.konsignapi.service;
 
+import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.entity.KonsignUser;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -51,10 +52,10 @@ public class JwtUtilService {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(UserDetails konsignUserDetails) {
+    public String generateAccessToken(UserDetails konsignUserDetails) {
         Map<String, Object> claims = new HashMap<>();
         if (konsignUserDetails instanceof KonsignUser) {
-            claims.put("tenantId", ((KonsignUser) konsignUserDetails).getTenantId());
+            claims.put(KonsignConstant.JWT_CLAIM_TENANT_ID, ((KonsignUser) konsignUserDetails).getTenantId());
         }
 
         claims.put(
@@ -64,15 +65,15 @@ public class JwtUtilService {
                         .toList());
 
         claims.put("jti", UUID.randomUUID().toString());
-        return createToken(claims, konsignUserDetails.getUsername());
+        return createToken(claims, konsignUserDetails.getUsername(), jwtExpirationInMillis);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(Map<String, Object> claims, String subject, int expirationInMillis) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMillis))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationInMillis))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
@@ -88,14 +89,13 @@ public class JwtUtilService {
         }
     }
 
-    public String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationInMillis))
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+    public String generateRefreshToken(UserDetails konsignUserDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        if (konsignUserDetails instanceof KonsignUser) {
+            claims.put(KonsignConstant.JWT_CLAIM_TENANT_ID, ((KonsignUser) konsignUserDetails).getTenantId());
+        }
+
+        return createToken(claims, konsignUserDetails.getUsername(), refreshExpirationInMillis);
     }
 
     public Map<String, Object> getMapFromIoJsonWebTokenClaims(DefaultClaims claims) {
@@ -122,7 +122,7 @@ public class JwtUtilService {
     public String extractTenantId(String token) {
         Claims claims = extractAllClaims(token);
 
-        Object tenantClaim = claims.get("tenantId");
+        Object tenantClaim = claims.get(KonsignConstant.JWT_CLAIM_TENANT_ID);
         if (tenantClaim == null) {
             return null;
         }

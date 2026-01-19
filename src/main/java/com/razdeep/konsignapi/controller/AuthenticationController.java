@@ -7,14 +7,10 @@ import com.razdeep.konsignapi.model.*;
 import com.razdeep.konsignapi.service.AuthenticationService;
 import com.razdeep.konsignapi.service.JwtUtilService;
 import com.razdeep.konsignapi.service.KonsignUserDetailsService;
-import io.jsonwebtoken.impl.DefaultClaims;
+import com.razdeep.konsignapi.service.RefreshTokenService;
+import com.razdeep.konsignapi.token.TokenPair;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,16 +32,19 @@ public class AuthenticationController {
     private final KonsignUserDetailsService konsignUserDetailsService;
     private final JwtUtilService jwtUtilService;
     private final AuthenticationService authenticationService;
+    private final RefreshTokenService refreshTokenService;
 
     public AuthenticationController(
             AuthenticationManager authenticationManager,
             KonsignUserDetailsService konsignUserDetailsService,
             JwtUtilService jwtUtilService,
-            AuthenticationService authenticationService) {
+            AuthenticationService authenticationService,
+            RefreshTokenService refreshTokenService) {
         this.authenticationManager = authenticationManager;
         this.konsignUserDetailsService = konsignUserDetailsService;
         this.jwtUtilService = jwtUtilService;
         this.authenticationService = authenticationService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/login")
@@ -59,14 +58,9 @@ public class AuthenticationController {
             final UserDetails konsignUserDetails =
                     konsignUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
 
-            final String tenantId = ((KonsignUserDetails) konsignUserDetails).getTenantId();
+            final String accessToken = jwtUtilService.generateAccessToken(konsignUserDetails);
 
-            final String accessToken = jwtUtilService.generateToken(konsignUserDetails);
-
-            final Map<String, Object> claims = new HashMap<>();
-            claims.put("tenantId", tenantId);
-
-            final String refreshToken = jwtUtilService.doGenerateRefreshToken(claims, konsignUserDetails.getUsername());
+            final String refreshToken = jwtUtilService.generateRefreshToken(konsignUserDetails);
 
             Cookie cookie = new Cookie(KonsignConstant.HEADER_REFRESH_TOKEN, refreshToken);
             cookie.setMaxAge(KonsignConfig.cookieMaxAge);
@@ -90,42 +84,12 @@ public class AuthenticationController {
         }
     }
 
-    @GetMapping(value = "/refresh")
-    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenPair> refresh(@RequestBody RefreshRequest request) {
 
-        if (request.getCookies() == null) {
-            return ResponseEntity.badRequest().build();
-        }
+        TokenPair response = refreshTokenService.refresh(request.getRefreshToken());
 
-        Optional<String> refreshTokenOptional = Arrays.stream(request.getCookies())
-                .filter(cookie -> cookie.getName().equals(KonsignConstant.HEADER_REFRESH_TOKEN))
-                .map(Cookie::getValue)
-                .findAny();
-
-        if (refreshTokenOptional.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        String refreshToken = refreshTokenOptional.get();
-        LOG.info("refresh token: %s".formatted(refreshToken));
-
-        try {
-            if (jwtUtilService.validateToken(refreshToken, null)) {
-                //
-                // jwtUtilService.validateToken(jwtUtilService.extractAccessTokenFromRequest(request),
-                // null);
-                DefaultClaims claims = (DefaultClaims) request.getAttribute(KonsignConstant.HEADER_CLAIMS);
-                final var claimsMap = jwtUtilService.getMapFromIoJsonWebTokenClaims(claims);
-                String jwtToken = jwtUtilService.doGenerateRefreshToken(claimsMap, (String) claimsMap.get("sub"));
-                AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-                authenticationResponse.setAccessToken(jwtToken);
-                return ResponseEntity.ok(authenticationResponse);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/signup")
