@@ -41,7 +41,7 @@ public class CollectionVoucherService {
             return false;
         }
 
-        final var agencyId = commonService.getAgencyId();
+        final var agencyId = commonService.getTenantId();
 
         CollectionVoucherEntity collectionVoucherEntity = CollectionVoucherEntity.builder()
                 .voucherNo(collectionVoucher.getVoucherNo())
@@ -49,7 +49,7 @@ public class CollectionVoucherService {
                 .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
                 .build();
 
-        collectionVoucherEntity.setAgencyId(agencyId);
+        collectionVoucherEntity.setTenantId(agencyId);
 
         //
         // collectionVoucherEntity.setCreationTimestamp(getVoucherByVoucherNo(collectionVoucher.getVoucherNo()));
@@ -72,7 +72,7 @@ public class CollectionVoucherService {
                             .ddNo(collectionVoucherItem.getDdNo())
                             .ddDate(LocalDate.parse(collectionVoucherItem.getDdDate()))
                             .build();
-                    collectionVoucherItemEntity.setAgencyId(agencyId);
+                    collectionVoucherItemEntity.setTenantId(agencyId);
                     return collectionVoucherItemEntity;
                 })
                 .collect(Collectors.toList());

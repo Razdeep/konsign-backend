@@ -54,7 +54,7 @@ public class BillService {
     //            })
     public boolean enterBill(Bill bill) {
 
-        final var agencyId = commonService.getAgencyId();
+        final var agencyId = commonService.getTenantId();
 
         BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
         SupplierEntity supplierEntity = supplierService.getSupplierBySupplierName(bill.getSupplierName());
@@ -81,27 +81,27 @@ public class BillService {
                     LrPmEntity lrPmEntity = new LrPmEntity(lrPm);
                     lrPmEntity.setLrPmId(bill.getBillNo() + "_" + lr_pm_index.getAndIncrement());
                     lrPmEntity.setBillEntry(billEntity);
-                    lrPmEntity.setAgencyId(agencyId);
+                    lrPmEntity.setTenantId(agencyId);
                     return lrPmEntity;
                 })
                 .collect(Collectors.toList());
 
         billEntity.setLrPmEntityList(lrPmEntityList);
-        billEntity.setAgencyId(agencyId);
+        billEntity.setTenantId(agencyId);
 
         billEntryRepository.save(billEntity);
         return true;
     }
 
     public Bill getBill(String billNo) {
-        String agencyId = commonService.getAgencyId();
+        String agencyId = commonService.getTenantId();
         return getBill(billNo, agencyId);
     }
 
     //    @Cacheable(value = "getBill", key = "#billNo.concat(#agencyId)")
     public Bill getBill(String billNo, String agencyId) {
 
-        final var billEntryOptional = billEntryRepository.findByBillNoAndAgencyId(billNo, agencyId);
+        final var billEntryOptional = billEntryRepository.findByBillNoAndTenantId(billNo, agencyId);
         if (billEntryOptional.isEmpty()) {
             return null;
         }
@@ -166,7 +166,7 @@ public class BillService {
     }
 
     public CustomPageImpl<Bill> getAllBills(int offset, int size) {
-        String agencyId = commonService.getAgencyId();
+        String agencyId = commonService.getTenantId();
         return getAllBills(offset, size, agencyId);
     }
 
@@ -175,7 +175,7 @@ public class BillService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Pageable pageable = PageRequest.of(offset, size, Sort.by("billNo").descending());
-        final var billEntityPages = billEntryRepository.findByAgencyId(agencyId, pageable);
+        final var billEntityPages = billEntryRepository.findByTenantId(agencyId, pageable);
         stopWatch.stop();
         LOG.info("repository call took {} ms", stopWatch.getLastTaskTimeMillis());
 

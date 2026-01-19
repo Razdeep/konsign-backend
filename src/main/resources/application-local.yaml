@@ -5,10 +5,14 @@ spring:
       password: konsign
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
 
 redis:
   host: localhost
   port: 6379
   username: default
   password: konsign
+
+
+#jwt:
+#  refreshTokenExpirationInMillis: 1000

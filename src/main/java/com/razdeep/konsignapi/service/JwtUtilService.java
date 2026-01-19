@@ -1,15 +1,21 @@
 package com.razdeep.konsignapi.service;
 
+import com.razdeep.konsignapi.constant.KonsignConstant;
+import com.razdeep.konsignapi.entity.KonsignUser;
+import com.razdeep.konsignapi.token.RefreshTokenGenerator;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +30,15 @@ public class JwtUtilService {
     @Value("${jwt.jwtExpirationInMillis}")
     private int jwtExpirationInMillis;
 
+    @Getter
     @Value("${jwt.refreshTokenExpirationInMillis}")
     private int refreshExpirationInMillis;
+
+    private RefreshTokenGenerator refreshTokenGenerator;
+
+    public JwtUtilService(RefreshTokenGenerator refreshTokenGenerator) {
+        this.refreshTokenGenerator = refreshTokenGenerator;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -48,17 +61,29 @@ public class JwtUtilService {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(UserDetails konsignUserDetails) {
+    public String generateAccessToken(UserDetails konsignUserDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, konsignUserDetails.getUsername());
+        if (konsignUserDetails instanceof KonsignUser) {
+            claims.put(KonsignConstant.JWT_CLAIM_TENANT_ID, ((KonsignUser) konsignUserDetails).getTenantId());
+        }
+
+        claims.put(
+                "roles",
+                konsignUserDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList());
+
+        claims.put("jti", UUID.randomUUID().toString());
+        return createToken(claims, konsignUserDetails.getUsername(), jwtExpirationInMillis);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    private String createToken(Map<String, Object> claims, String subject, int expirationInMillis) {
+        long currentTimeMs = System.currentTimeMillis();
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationInMillis))
+                .setIssuedAt(new Date(currentTimeMs))
+                .setExpiration(new Date(currentTimeMs + expirationInMillis))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
@@ -74,14 +99,8 @@ public class JwtUtilService {
         }
     }
 
-    public String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + refreshExpirationInMillis))
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
+    public String generateRefreshToken() {
+        return refreshTokenGenerator.generate();
     }
 
     public Map<String, Object> getMapFromIoJsonWebTokenClaims(DefaultClaims claims) {
@@ -103,5 +122,16 @@ public class JwtUtilService {
         }
 
         return authorizationHeaderStr.substring(BEARER_KEYWORD.length());
+    }
+
+    public String extractTenantId(String token) {
+        Claims claims = extractAllClaims(token);
+
+        Object tenantClaim = claims.get(KonsignConstant.JWT_CLAIM_TENANT_ID);
+        if (tenantClaim == null) {
+            return null;
+        }
+
+        return tenantClaim.toString();
     }
 }

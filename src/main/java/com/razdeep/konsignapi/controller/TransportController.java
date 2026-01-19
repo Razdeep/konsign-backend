@@ -1,7 +1,7 @@
 package com.razdeep.konsignapi.controller;
 
 import com.razdeep.konsignapi.constant.KonsignConstant;
-import com.razdeep.konsignapi.model.ResponseVerdict;
+import com.razdeep.konsignapi.model.KonsignApiResponse;
 import com.razdeep.konsignapi.model.Transport;
 import com.razdeep.konsignapi.service.TransportService;
 import io.micrometer.core.annotation.Timed;
@@ -21,36 +21,36 @@ public class TransportController {
 
     @Timed
     @PostMapping
-    ResponseEntity<ResponseVerdict> addTransport(@RequestBody Transport transport) {
-        ResponseVerdict responseVerdict = new ResponseVerdict();
+    ResponseEntity<KonsignApiResponse> addTransport(@RequestBody Transport transport) {
+        KonsignApiResponse konsignApiResponse = new KonsignApiResponse();
         if (transportService.addTransport(transport)) {
-            responseVerdict.setMessage("Successfully added transport");
-            return new ResponseEntity<>(responseVerdict, HttpStatus.OK);
+            konsignApiResponse.setMessage("Successfully added transport");
+            return new ResponseEntity<>(konsignApiResponse, HttpStatus.OK);
         } else {
-            responseVerdict.setMessage("Failed to add transport");
-            return new ResponseEntity<>(responseVerdict, HttpStatus.BAD_REQUEST);
+            konsignApiResponse.setMessage("Failed to add transport");
+            return new ResponseEntity<>(konsignApiResponse, HttpStatus.BAD_REQUEST);
         }
     }
 
     @Timed
     @GetMapping
-    ResponseEntity<ResponseVerdict> getTransports() {
-        ResponseVerdict responseVerdict = new ResponseVerdict();
-        responseVerdict.setData(transportService.getTransports());
-        return new ResponseEntity<>(responseVerdict, HttpStatus.OK);
+    ResponseEntity<KonsignApiResponse> getTransports() {
+        KonsignApiResponse konsignApiResponse = new KonsignApiResponse();
+        konsignApiResponse.setData(transportService.getTransports());
+        return new ResponseEntity<>(konsignApiResponse, HttpStatus.OK);
     }
 
     @Timed
     @DeleteMapping("/{transportId}")
-    ResponseEntity<ResponseVerdict> deleteTransport(@PathVariable String transportId) {
+    ResponseEntity<KonsignApiResponse> deleteTransport(@PathVariable String transportId) {
         String message;
         if (transportService.deleteTransport(transportId)) {
             message = "Successfully deleted transport Id: " + transportId;
         } else {
             message = transportId + " is already deleted";
         }
-        ResponseVerdict responseVerdict = new ResponseVerdict();
-        responseVerdict.setMessage(message);
-        return new ResponseEntity<>(responseVerdict, HttpStatus.OK);
+        KonsignApiResponse konsignApiResponse = new KonsignApiResponse();
+        konsignApiResponse.setMessage(message);
+        return new ResponseEntity<>(konsignApiResponse, HttpStatus.OK);
     }
 }

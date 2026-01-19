@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface KonsignUserRepository extends JpaRepository<KonsignUser, Integer> {
+public interface KonsignUserRepository extends JpaRepository<KonsignUser, Long> {
     Optional<KonsignUser> findKonsignUserByUsername(String username);
+
+    Optional<KonsignUser> findKonsignUserById(Long id);
 }

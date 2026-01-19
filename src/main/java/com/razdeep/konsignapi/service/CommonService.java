@@ -54,13 +54,13 @@ public class CommonService {
         return sb.toString();
     }
 
-    public String getAgencyId() {
+    public String getTenantId() {
         KonsignUserDetails konsignUserDetails = (KonsignUserDetails)
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (konsignUserDetails == null) {
             return null;
         }
-        return konsignUserDetails.getAgencyId();
+        return konsignUserDetails.getTenantId();
     }
 
     private byte[] convertHtmlToPdf(String html) throws Exception {

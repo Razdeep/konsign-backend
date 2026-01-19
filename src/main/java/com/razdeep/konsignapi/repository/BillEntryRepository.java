@@ -15,7 +15,7 @@ public interface BillEntryRepository extends JpaRepository<BillEntity, String> {
     @Query(value = "select billEntity from BillEntity billEntity where billEntity.buyerEntity.buyerId = ?1")
     List<BillEntity> findAllBillsByBuyerId(String buyerId);
 
-    Optional<BillEntity> findByBillNoAndAgencyId(String billNo, String agencyId);
+    Optional<BillEntity> findByBillNoAndTenantId(String billNo, String tenantId);
 
-    Page<BillEntity> findByAgencyId(String agencyId, Pageable pageable);
+    Page<BillEntity> findByTenantId(String tenantId, Pageable pageable);
 }

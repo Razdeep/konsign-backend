@@ -9,11 +9,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TransportRepository extends JpaRepository<TransportEntity, String> {
 
-    List<TransportEntity> findAllTransportByTransportNameAndAgencyId(String transportName, String agencyId);
+    List<TransportEntity> findAllTransportByTransportNameAndTenantId(String transportName, String tenantId);
 
-    List<TransportEntity> findAllByAgencyId(String agencyId);
+    List<TransportEntity> findAllByTenantId(String tenantId);
 
-    Optional<TransportEntity> findByTransportIdAndAgencyId(String transportId, String agencyId);
+    Optional<TransportEntity> findByTransportIdAndTenantId(String transportId, String tenantId);
 
-    void deleteByTransportIdAndAgencyId(String transportId, String agencyId);
+    void deleteByTransportIdAndTenantId(String transportId, String tenantId);
 }

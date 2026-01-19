@@ -25,10 +25,10 @@ public class TransportService {
 
     //    @CacheEvict(value = "getTransports", allEntries = true)
     public boolean addTransport(Transport transport) {
-        String agencyId = commonService.getAgencyId();
+        String agencyId = commonService.getTenantId();
 
         if (!transportRepository
-                .findAllTransportByTransportNameAndAgencyId(transport.getTransportName(), agencyId)
+                .findAllTransportByTransportNameAndTenantId(transport.getTransportName(), agencyId)
                 .isEmpty()) {
             return false;
         }
@@ -51,20 +51,20 @@ public class TransportService {
                 .transportName(transport.getTransportName())
                 .build();
 
-        transportEntity.setAgencyId(agencyId);
+        transportEntity.setTenantId(agencyId);
 
         transportRepository.save(transportEntity);
         return true;
     }
 
     public TransportEntity getTransportByTransportName(String transportName) {
-        String agencyId = commonService.getAgencyId();
-        final var resultList = transportRepository.findAllTransportByTransportNameAndAgencyId(transportName, agencyId);
+        String agencyId = commonService.getTenantId();
+        final var resultList = transportRepository.findAllTransportByTransportNameAndTenantId(transportName, agencyId);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 
     public List<Transport> getTransports() {
-        String agencyId = commonService.getAgencyId();
+        String agencyId = commonService.getTenantId();
         return getTransports(agencyId);
     }
 
@@ -72,7 +72,7 @@ public class TransportService {
     public List<Transport> getTransports(String agencyId) {
         List<Transport> result = new ArrayList<>();
         transportRepository
-                .findAllByAgencyId(agencyId)
+                .findAllByTenantId(agencyId)
                 .forEach((transportEntity) -> result.add(
                         new Transport(transportEntity.getTransportId(), transportEntity.getTransportName())));
         return result;
@@ -80,12 +80,12 @@ public class TransportService {
 
     //    @CacheEvict(value = "getTransports", allEntries = true)
     public boolean deleteTransport(String transportId) {
-        String agencyId = commonService.getAgencyId();
+        String agencyId = commonService.getTenantId();
         boolean wasPresent = transportRepository
-                .findByTransportIdAndAgencyId(transportId, agencyId)
+                .findByTransportIdAndTenantId(transportId, agencyId)
                 .isPresent();
         if (wasPresent) {
-            transportRepository.deleteByTransportIdAndAgencyId(transportId, agencyId);
+            transportRepository.deleteByTransportIdAndTenantId(transportId, agencyId);
         }
         return wasPresent;
     }

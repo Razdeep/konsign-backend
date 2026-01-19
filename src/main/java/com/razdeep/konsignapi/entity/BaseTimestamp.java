@@ -19,6 +19,6 @@ public class BaseTimestamp {
     @Column(name = "update_timestamp")
     private LocalDateTime updateTimestamp;
 
-    @Column(name = "agency_id")
-    private String agencyId;
+    @Column(name = "tenant_id")
+    private String tenantId;
 }
