@@ -2,6 +2,7 @@ package com.razdeep.konsignapi.service;
 
 import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.entity.KonsignUser;
+import com.razdeep.konsignapi.token.RefreshTokenGenerator;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,8 +30,15 @@ public class JwtUtilService {
     @Value("${jwt.jwtExpirationInMillis}")
     private int jwtExpirationInMillis;
 
+    @Getter
     @Value("${jwt.refreshTokenExpirationInMillis}")
     private int refreshExpirationInMillis;
+
+    private RefreshTokenGenerator refreshTokenGenerator;
+
+    public JwtUtilService(RefreshTokenGenerator refreshTokenGenerator) {
+        this.refreshTokenGenerator = refreshTokenGenerator;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -69,11 +78,12 @@ public class JwtUtilService {
     }
 
     private String createToken(Map<String, Object> claims, String subject, int expirationInMillis) {
+        long currentTimeMs = System.currentTimeMillis();
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationInMillis))
+                .setIssuedAt(new Date(currentTimeMs))
+                .setExpiration(new Date(currentTimeMs + expirationInMillis))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
@@ -89,13 +99,8 @@ public class JwtUtilService {
         }
     }
 
-    public String generateRefreshToken(UserDetails konsignUserDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        if (konsignUserDetails instanceof KonsignUser) {
-            claims.put(KonsignConstant.JWT_CLAIM_TENANT_ID, ((KonsignUser) konsignUserDetails).getTenantId());
-        }
-
-        return createToken(claims, konsignUserDetails.getUsername(), refreshExpirationInMillis);
+    public String generateRefreshToken() {
+        return refreshTokenGenerator.generate();
     }
 
     public Map<String, Object> getMapFromIoJsonWebTokenClaims(DefaultClaims claims) {

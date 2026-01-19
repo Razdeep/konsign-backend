@@ -12,7 +12,7 @@ import lombok.Setter;
 public class KonsignUser extends BaseTimestamp {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private long id;
 
     @Column(name = "username", unique = true)
     private String username;

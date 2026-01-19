@@ -11,6 +11,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class KonsignUserDetails implements UserDetails {
+    @Getter
+    private final long id;
+
     private final String username;
     private final String password;
 
@@ -21,6 +24,7 @@ public class KonsignUserDetails implements UserDetails {
     private final List<GrantedAuthority> authorities;
 
     public KonsignUserDetails(KonsignUser konsignUser) {
+        id = konsignUser.getId();
         username = konsignUser.getUsername();
         password = konsignUser.getPassword();
         enabled = konsignUser.isActive();

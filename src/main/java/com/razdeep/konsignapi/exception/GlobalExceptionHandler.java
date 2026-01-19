@@ -32,6 +32,22 @@ public class GlobalExceptionHandler {
                 .body(new KonsignApiResponse(false, "Username already exists", null));
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<KonsignApiResponse> handleUserNotFound(UserNotFoundException ex) {
+
+        LOG.info("User not found", ex);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new KonsignApiResponse(false, "User not found", null));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<KonsignApiResponse> handleUnauthorizedException(UnauthorizedException ex) {
+
+        LOG.info("Unauthorized exception", ex);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new KonsignApiResponse(false, "Unauthorized", null));
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<KonsignApiResponse> handleGenericException(Exception ex) {
 

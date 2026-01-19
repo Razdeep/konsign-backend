@@ -3,11 +3,17 @@ package com.razdeep.konsignapi.entity;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "refresh_tokens")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class RefreshTokenEntity {
 
     @Id

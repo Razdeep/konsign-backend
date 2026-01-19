@@ -2,12 +2,14 @@ package com.razdeep.konsignapi.service;
 
 import com.razdeep.konsignapi.entity.RefreshTokenEntity;
 import com.razdeep.konsignapi.exception.UnauthorizedException;
+import com.razdeep.konsignapi.model.KonsignUserDetails;
 import com.razdeep.konsignapi.repository.RefreshTokenRepository;
 import com.razdeep.konsignapi.token.RefreshTokenGenerator;
 import com.razdeep.konsignapi.token.TokenPair;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -58,12 +60,22 @@ public class RefreshTokenService {
 
         repository.save(newToken);
 
-        final UserDetails konsignUserDetails = konsignUserDetailsService.loadUserByUsername(
-                oldToken.getUserId().toString()); // hack
+        final UserDetails konsignUserDetails = konsignUserDetailsService.loadUserByUserId(oldToken.getUserId());
 
         // Create new access token (JWT)
         String accessToken = jwtUtilService.generateAccessToken(konsignUserDetails);
 
         return new TokenPair(accessToken, newToken.getToken());
+    }
+
+    public void registerRefreshToken(KonsignUserDetails konsignUserDetails, String refreshTokenValue) {
+        repository.save(RefreshTokenEntity.builder()
+                .token(refreshTokenValue)
+                .userId(konsignUserDetails.getId())
+                .tenantId(konsignUserDetails.getTenantId())
+                .expiresAt(new Date(System.currentTimeMillis() + jwtUtilService.getRefreshExpirationInMillis())
+                        .toInstant())
+                .revoked(false)
+                .build());
     }
 }

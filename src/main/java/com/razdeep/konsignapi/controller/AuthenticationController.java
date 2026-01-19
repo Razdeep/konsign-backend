@@ -51,7 +51,7 @@ public class AuthenticationController {
 
     @PostMapping("/refresh")
     public ResponseEntity<KonsignApiResponse> refresh(@RequestBody RefreshRequest request) {
-        TokenPair tokenPair = refreshTokenService.refresh(request.getRefreshToken());
+        TokenPair tokenPair = refreshTokenService.refresh(request.refreshToken());
         KonsignApiResponse konsignApiResponse =
                 KonsignApiResponse.builder().data(tokenPair).build();
         return ResponseEntity.ok(konsignApiResponse);
@@ -61,8 +61,10 @@ public class AuthenticationController {
     public ResponseEntity<KonsignApiResponse> signup(@RequestBody UserRegistration userRegistration)
             throws UsernameAlreadyExists {
         authenticationService.register(userRegistration);
-        KonsignApiResponse konsignApiResponse =
-                KonsignApiResponse.builder().message("Successfully registered").build();
+        KonsignApiResponse konsignApiResponse = KonsignApiResponse.builder()
+                .message("Successfully registered")
+                .success(true)
+                .build();
         return ResponseEntity.ok(konsignApiResponse);
     }
 

@@ -12,3 +12,7 @@ redis:
   port: 6379
   username: default
   password: konsign
+
+
+#jwt:
+#  refreshTokenExpirationInMillis: 1000
