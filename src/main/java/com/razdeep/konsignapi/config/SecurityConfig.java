@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests.requestMatchers(
-                                KonsignConstant.CONTROLLER_API_PREFIX + "/auth", "/actuator/**")
+                                KonsignConstant.CONTROLLER_API_PREFIX + "/auth/**", "/actuator/**")
                         .permitAll()
                         .anyRequest()
                         .hasRole("USER"))

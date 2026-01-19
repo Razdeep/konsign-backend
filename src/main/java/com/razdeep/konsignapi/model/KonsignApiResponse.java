@@ -2,16 +2,17 @@ package com.razdeep.konsignapi.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResponseVerdict implements Serializable {
+@Builder
+public class KonsignApiResponse implements Serializable {
+
+    @JsonProperty("success")
+    private boolean success = true;
 
     @JsonProperty("message")
     private String message;

@@ -1,0 +1,43 @@
+package com.razdeep.konsignapi.exception;
+
+import com.razdeep.konsignapi.model.KonsignApiResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class.getName());
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<KonsignApiResponse> handleBadCredentials(BadCredentialsException ex) {
+
+        LOG.info("bad credential exception", ex);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new KonsignApiResponse(false, "Username or password mismatch", null));
+    }
+
+    @ExceptionHandler(UsernameAlreadyExists.class)
+    public ResponseEntity<KonsignApiResponse> handleUsernameAlreadyExists(UsernameAlreadyExists ex) {
+
+        LOG.info("User name already exists", ex);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new KonsignApiResponse(false, "Username already exists", null));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<KonsignApiResponse> handleGenericException(Exception ex) {
+
+        LOG.error("Unexpected error", ex);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new KonsignApiResponse(false, "An unexpected error occurred", null));
+    }
+}
