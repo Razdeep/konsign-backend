@@ -1,3 +1,11 @@
+server:
+  port: 8443
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: changeit
+    key-store-type: PKCS12
+    key-alias: springboot-local
+
 spring:
   datasource:
       url: jdbc:postgresql://localhost:5432/konsign
@@ -5,7 +13,7 @@ spring:
       password: konsign
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
 
 redis:
   host: localhost

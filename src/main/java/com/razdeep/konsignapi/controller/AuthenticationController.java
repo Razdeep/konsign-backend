@@ -1,15 +1,15 @@
 package com.razdeep.konsignapi.controller;
 
-import com.razdeep.konsignapi.config.KonsignConfig;
 import com.razdeep.konsignapi.constant.KonsignConstant;
 import com.razdeep.konsignapi.exception.UsernameAlreadyExists;
 import com.razdeep.konsignapi.model.*;
 import com.razdeep.konsignapi.service.AuthenticationService;
 import com.razdeep.konsignapi.service.RefreshTokenService;
 import com.razdeep.konsignapi.token.TokenPair;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +33,14 @@ public class AuthenticationController {
 
         TokenPair tokenPair = authenticationService.login(authenticationRequest);
 
-        Cookie cookie = new Cookie(KonsignConstant.HEADER_REFRESH_TOKEN, tokenPair.refreshToken());
-        cookie.setMaxAge(KonsignConfig.cookieMaxAge);
-        cookie.setHttpOnly(KonsignConfig.cookieHttpOnly);
-        cookie.setSecure(true); // MUST be true in prod
-        cookie.setPath(KonsignConfig.cookiePath);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(KonsignConstant.HEADER_REFRESH_TOKEN, tokenPair.refreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setAccessToken(tokenPair.accessToken());
@@ -50,10 +52,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<KonsignApiResponse> refresh(@RequestBody RefreshRequest request) {
-        TokenPair tokenPair = refreshTokenService.refresh(request.refreshToken());
-        KonsignApiResponse konsignApiResponse =
-                KonsignApiResponse.builder().data(tokenPair).build();
+    public ResponseEntity<KonsignApiResponse> refresh(
+            @CookieValue(name = "refresh-token", required = false) String refreshToken) {
+        String accessToken = refreshTokenService.generateAccessTokenWithRefreshToken(refreshToken);
+        KonsignApiResponse konsignApiResponse = KonsignApiResponse.builder()
+                .message("new access token generated")
+                .success(true)
+                .data(new AuthenticationResponse(accessToken))
+                .build();
         return ResponseEntity.ok(konsignApiResponse);
     }
 
