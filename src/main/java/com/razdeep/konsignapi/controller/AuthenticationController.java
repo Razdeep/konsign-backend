@@ -34,13 +34,12 @@ public class AuthenticationController {
         TokenPair tokenPair = authenticationService.login(authenticationRequest);
 
         ResponseCookie cookie = ResponseCookie.from(KonsignConstant.HEADER_REFRESH_TOKEN, tokenPair.refreshToken())
-                .httpOnly(false) // TODO hack
-                .secure(false) // TODO make it secure in prod / have local false setup
-                .sameSite("Lax") // TODO later change to strict for prod / make it config driven
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .build();
 
-        //        response.addCookie(cookie);
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
@@ -55,9 +54,12 @@ public class AuthenticationController {
     @PostMapping("/refresh")
     public ResponseEntity<KonsignApiResponse> refresh(
             @CookieValue(name = "refresh-token", required = false) String refreshToken) {
-        TokenPair tokenPair = refreshTokenService.refresh(refreshToken);
-        KonsignApiResponse konsignApiResponse =
-                KonsignApiResponse.builder().data(tokenPair).build();
+        String accessToken = refreshTokenService.generateAccessTokenWithRefreshToken(refreshToken);
+        KonsignApiResponse konsignApiResponse = KonsignApiResponse.builder()
+                .message("new access token generated")
+                .success(true)
+                .data(new AuthenticationResponse(accessToken))
+                .build();
         return ResponseEntity.ok(konsignApiResponse);
     }
 
