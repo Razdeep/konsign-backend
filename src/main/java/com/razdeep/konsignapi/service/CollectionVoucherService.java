@@ -61,13 +61,13 @@ public class CollectionVoucherService {
         collectionVoucherItemEntityList = collectionVoucher.getCollectionVoucherItemList().stream()
                 .map(collectionVoucherItem -> {
                     final var targetBill = billService.getBill(collectionVoucherItem.getBillNo());
-                    final var targetBilEntity = billService.convertBillIntoBillEntity(targetBill);
+                    final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
                     final var collectionVoucherItemId =
                             collectionVoucher.getVoucherNo() + "_" + collectionVoucherItemIndex.getAndIncrement();
                     final var collectionVoucherItemEntity = CollectionVoucherItemEntity.builder()
                             .collectionVoucherItemId(collectionVoucherItemId)
                             .collectionVoucher(collectionVoucherEntity)
-                            .bill(targetBilEntity)
+                            .bill(targetBillEntity)
                             .amountCollected(collectionVoucherItem.getAmountCollected())
                             .bank(collectionVoucherItem.getBank())
                             .ddNo(collectionVoucherItem.getDdNo())

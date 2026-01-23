@@ -7,7 +7,6 @@ import com.razdeep.konsignapi.mapper.BillMapper;
 import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.CustomPageImpl;
 import com.razdeep.konsignapi.repository.BillEntryRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -99,20 +98,14 @@ public class BillService {
         final var targetSupplierEntity = supplierService.getSupplierBySupplierName(bill.supplierName());
         final var targetBuyerEntity = buyerService.getBuyerByBuyerName(bill.buyerName());
         final var targetTransportEntity = transportService.getTransportByTransportName(bill.transportName());
-        List<LrPmEntity> targetLrPmEntityList = new ArrayList<>();
-        if (bill.lrPmList() != null) {
-            targetLrPmEntityList = bill.lrPmList().stream().map(LrPmEntity::new).collect(Collectors.toList());
-        }
-        return BillEntity.builder()
-                .billNo(bill.billNo())
-                .supplierEntity(targetSupplierEntity)
-                .buyerEntity(targetBuyerEntity)
-                .billDate(bill.billDate())
-                .transportEntity(targetTransportEntity)
-                .lrDate(bill.lrDate())
-                .billAmount(bill.billAmount())
-                .lrPmEntityList(targetLrPmEntityList)
-                .build();
+
+        final var billEntity = billMapper.toEntity(bill);
+
+        billEntity.setSupplierEntity(targetSupplierEntity);
+        billEntity.setBuyerEntity(targetBuyerEntity);
+        billEntity.setTransportEntity(targetTransportEntity);
+
+        return billEntity;
     }
 
     public CustomPageImpl<Bill> getAllBills(int offset, int size) {
