@@ -10,4 +10,8 @@ public interface LrPmMapper {
     LrPm toModel(LrPmEntity entity);
 
     List<LrPm> toModelList(List<LrPmEntity> entities);
+
+    LrPmEntity toEntity(LrPm lrPm);
+
+    List<LrPmEntity> toEntityList(List<LrPm> entities);
 }

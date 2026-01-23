@@ -75,4 +75,20 @@ public class GlobalExceptionHandler {
                         .message(message)
                         .build());
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<KonsignApiResponse> handleValidationErrors(ResourceNotFoundException ex) {
+
+        LOG.info("Resource not found", ex);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new KonsignApiResponse(false, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(SaveResourceException.class)
+    public ResponseEntity<KonsignApiResponse> handleValidationErrors(SaveResourceException ex) {
+
+        LOG.info("Resource could not be saved", ex);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new KonsignApiResponse(false, ex.getMessage(), null));
+    }
 }

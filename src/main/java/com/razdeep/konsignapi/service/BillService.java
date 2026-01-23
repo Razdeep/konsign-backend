@@ -1,13 +1,14 @@
 package com.razdeep.konsignapi.service;
 
 import com.razdeep.konsignapi.entity.*;
+import com.razdeep.konsignapi.exception.ResourceNotFoundException;
+import com.razdeep.konsignapi.exception.SaveResourceException;
 import com.razdeep.konsignapi.mapper.BillMapper;
 import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.CustomPageImpl;
 import com.razdeep.konsignapi.repository.BillEntryRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,57 +47,31 @@ public class BillService {
         this.billMapper = billMapper;
     }
 
-    public boolean enterBill(Bill bill) {
-
-        final var agencyId = commonService.getTenantId();
+    public void addBill(Bill bill) {
 
         BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(bill.buyerName());
         SupplierEntity supplierEntity = supplierService.getSupplierBySupplierName(bill.supplierName());
         TransportEntity transportEntity = transportService.getTransportByTransportName(bill.transportName());
 
         if (buyerEntity == null || supplierEntity == null || transportEntity == null || bill.lrPmList() == null) {
-            return false;
+            throw new SaveResourceException(bill.billNo() + " could not be saved");
         }
 
-        BillEntity billEntity = BillEntity.builder()
-                .buyerEntity(buyerEntity)
-                .billNo(bill.billNo())
-                .billAmount(bill.billAmount())
-                .billDate(bill.billDate())
-                .lrDate(bill.lrDate())
-                .supplierEntity(supplierEntity)
-                .transportEntity(transportEntity)
-                .build();
-
-        AtomicInteger lr_pm_index = new AtomicInteger();
-
-        List<LrPmEntity> lrPmEntityList = bill.lrPmList().stream()
-                .map(lrPm -> {
-                    LrPmEntity lrPmEntity = new LrPmEntity(lrPm);
-                    lrPmEntity.setLrPmId(bill.billNo() + "_" + lr_pm_index.getAndIncrement());
-                    lrPmEntity.setBillEntry(billEntity);
-                    lrPmEntity.setTenantId(agencyId);
-                    return lrPmEntity;
-                })
-                .collect(Collectors.toList());
-
-        billEntity.setLrPmEntityList(lrPmEntityList);
-        billEntity.setTenantId(agencyId);
+        BillEntity billEntity = billMapper.toEntity(bill);
 
         billEntryRepository.save(billEntity);
-        return true;
     }
 
     public Bill getBill(String billNo) {
-        String agencyId = commonService.getTenantId();
-        return getBill(billNo, agencyId);
+        String tenantId = commonService.getTenantId();
+        return getBill(billNo, tenantId);
     }
 
-    public Bill getBill(String billNo, String agencyId) {
+    public Bill getBill(String billNo, String tenantId) throws ResourceNotFoundException {
 
-        final var billEntryOptional = billEntryRepository.findByBillNoAndTenantId(billNo, agencyId);
+        final var billEntryOptional = billEntryRepository.findByBillNoAndTenantId(billNo, tenantId);
         if (billEntryOptional.isEmpty()) {
-            return null;
+            throw new ResourceNotFoundException("Bill " + billNo + " not found");
         }
         final var billEntry = billEntryOptional.get();
 
