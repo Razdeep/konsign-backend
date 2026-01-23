@@ -8,7 +8,6 @@ import com.razdeep.konsignapi.model.CollectionVoucherItem;
 import com.razdeep.konsignapi.model.PendingBill;
 import com.razdeep.konsignapi.repository.CollectionVoucherRepository;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +45,7 @@ public class CollectionVoucherService {
 
         CollectionVoucherEntity collectionVoucherEntity = CollectionVoucherEntity.builder()
                 .voucherNo(collectionVoucher.getVoucherNo())
-                .voucherDate(LocalDate.parse(collectionVoucher.getVoucherDate()))
+                .voucherDate(collectionVoucher.getVoucherDate())
                 .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
                 .build();
 
@@ -71,7 +70,7 @@ public class CollectionVoucherService {
                             .amountCollected(collectionVoucherItem.getAmountCollected())
                             .bank(collectionVoucherItem.getBank())
                             .ddNo(collectionVoucherItem.getDdNo())
-                            .ddDate(LocalDate.parse(collectionVoucherItem.getDdDate()))
+                            .ddDate(collectionVoucherItem.getDdDate())
                             .build();
                     collectionVoucherItemEntity.setTenantId(agencyId);
                     return collectionVoucherItemEntity;
@@ -168,14 +167,14 @@ public class CollectionVoucherService {
                             .amountCollected(collectionVoucherItemEntity.getAmountCollected())
                             .bank(collectionVoucherItemEntity.getBank())
                             .ddNo(collectionVoucherItemEntity.getDdNo())
-                            .ddDate(String.valueOf(collectionVoucherItemEntity.getDdDate()))
+                            .ddDate(collectionVoucherItemEntity.getDdDate())
                             .build();
                 })
                 .collect(Collectors.toList());
 
         return CollectionVoucher.builder()
                 .voucherNo(collectionVoucherEntity.getVoucherNo())
-                .voucherDate(String.valueOf(collectionVoucherEntity.getVoucherDate()))
+                .voucherDate(collectionVoucherEntity.getVoucherDate())
                 .buyerName(collectionVoucherEntity.getBuyer().getBuyerName())
                 .collectionVoucherItemList(collectionVoucherItemList)
                 .build();

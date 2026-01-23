@@ -1,10 +1,13 @@
 package com.razdeep.konsignapi.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @Builder
 public class CollectionVoucherItem {
 
@@ -22,6 +25,5 @@ public class CollectionVoucherItem {
 
     String ddNo;
 
-    //    @JsonFormat(pattern="yyyy-MM-dd")
-    String ddDate;
+    LocalDate ddDate;
 }

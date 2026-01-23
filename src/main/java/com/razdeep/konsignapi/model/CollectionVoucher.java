@@ -1,5 +1,6 @@
 package com.razdeep.konsignapi.model;
 
+import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -10,9 +11,7 @@ public class CollectionVoucher {
 
     private String voucherNo;
 
-    // TODO find a way to use LocalDate here
-    //    @JsonFormat(pattern="yyyy-MM-dd")
-    private String voucherDate;
+    private LocalDate voucherDate;
 
     private String buyerName;
 
