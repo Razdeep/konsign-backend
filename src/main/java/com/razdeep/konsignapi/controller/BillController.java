@@ -5,6 +5,7 @@ import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.KonsignApiResponse;
 import com.razdeep.konsignapi.service.BillService;
 import io.micrometer.core.annotation.Timed;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class BillController {
 
     @Timed
     @PostMapping
-    public ResponseEntity<KonsignApiResponse> addBillEntry(@RequestBody Bill bill) {
+    public ResponseEntity<KonsignApiResponse> addBillEntry(@Valid @RequestBody Bill bill) {
 
         billService.addBill(bill);
         KonsignApiResponse konsignApiResponse = KonsignApiResponse.builder()

@@ -58,6 +58,9 @@ public class BillService {
         }
 
         BillEntity billEntity = billMapper.toEntity(bill);
+        billEntity.setBuyerEntity(buyerEntity);
+        billEntity.setSupplierEntity(supplierEntity);
+        billEntity.setTransportEntity(transportEntity);
 
         billEntryRepository.save(billEntity);
     }
