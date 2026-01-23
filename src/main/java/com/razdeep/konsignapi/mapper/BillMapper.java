@@ -20,6 +20,9 @@ public interface BillMapper {
     @Mapping(source = "lrPmEntityList", target = "lrPmList")
     Bill toModel(BillEntity entity);
 
+    @Mapping(source = "supplierName", target = "supplierEntity.supplierName")
+    @Mapping(source = "buyerName", target = "buyerEntity.buyerName")
+    @Mapping(source = "transportName", target = "transportEntity.transportName")
     @Mapping(source = "lrPmList", target = "lrPmEntityList")
     BillEntity toEntity(Bill bill);
 

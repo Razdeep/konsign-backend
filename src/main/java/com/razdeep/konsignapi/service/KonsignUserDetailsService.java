@@ -5,7 +5,6 @@ import com.razdeep.konsignapi.exception.UserNotFoundException;
 import com.razdeep.konsignapi.model.KonsignUserDetails;
 import com.razdeep.konsignapi.repository.KonsignUserRepository;
 import java.util.Optional;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public class KonsignUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UserNotFoundException {
+    public KonsignUserDetails loadUserByUsername(String username) throws UserNotFoundException {
         Optional<KonsignUser> konsignUser = konsignUserRepository.findKonsignUserByUsername(username);
         if (konsignUser.isEmpty()) {
             throw new UserNotFoundException("user name not found");
@@ -27,7 +26,7 @@ public class KonsignUserDetailsService implements UserDetailsService {
         return new KonsignUserDetails(konsignUser.get());
     }
 
-    public UserDetails loadUserByUserId(long userId) throws UserNotFoundException {
+    public KonsignUserDetails loadUserByUserId(long userId) throws UserNotFoundException {
         Optional<KonsignUser> konsignUser = konsignUserRepository.findKonsignUserById(userId);
         if (konsignUser.isEmpty()) {
             throw new UserNotFoundException("user not found");
