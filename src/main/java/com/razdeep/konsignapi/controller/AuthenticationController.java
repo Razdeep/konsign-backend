@@ -7,6 +7,7 @@ import com.razdeep.konsignapi.service.AuthenticationService;
 import com.razdeep.konsignapi.service.RefreshTokenService;
 import com.razdeep.konsignapi.token.TokenPair;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -29,7 +30,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<KonsignApiResponse> login(
-            @RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) {
+            @Valid @RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) {
 
         TokenPair tokenPair = authenticationService.login(authenticationRequest);
 
@@ -42,8 +43,7 @@ public class AuthenticationController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setAccessToken(tokenPair.accessToken());
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse(tokenPair.accessToken());
 
         return ResponseEntity.ok(KonsignApiResponse.builder()
                 .success(true)
@@ -64,7 +64,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "/signup")
-    public ResponseEntity<KonsignApiResponse> signup(@RequestBody UserRegistration userRegistration)
+    public ResponseEntity<KonsignApiResponse> signup(@Valid @RequestBody UserRegistration userRegistration)
             throws UsernameAlreadyExists {
         authenticationService.register(userRegistration);
         KonsignApiResponse konsignApiResponse = KonsignApiResponse.builder()

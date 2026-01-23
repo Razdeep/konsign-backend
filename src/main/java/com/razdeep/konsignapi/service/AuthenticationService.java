@@ -51,10 +51,10 @@ public class AuthenticationService {
 
     public TokenPair login(AuthenticationRequest authenticationRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+                authenticationRequest.username(), authenticationRequest.password()));
 
         final KonsignUserDetails konsignUserDetails =
-                (KonsignUserDetails) konsignUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+                (KonsignUserDetails) konsignUserDetailsService.loadUserByUsername(authenticationRequest.username());
 
         final String accessToken = jwtUtilService.generateAccessToken(konsignUserDetails);
 

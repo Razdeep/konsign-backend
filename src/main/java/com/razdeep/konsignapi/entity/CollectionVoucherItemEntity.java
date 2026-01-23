@@ -1,6 +1,7 @@
 package com.razdeep.konsignapi.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.*;
 
@@ -25,7 +26,8 @@ public class CollectionVoucherItemEntity extends BaseTimestamp {
     @JoinColumn(name = "bill_bill_no")
     BillEntity bill;
 
-    Double amountCollected;
+    @Column(nullable = false, precision = 15, scale = 2)
+    BigDecimal amountCollected;
 
     String bank;
 

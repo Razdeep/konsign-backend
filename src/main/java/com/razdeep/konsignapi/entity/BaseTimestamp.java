@@ -3,12 +3,14 @@ package com.razdeep.konsignapi.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @MappedSuperclass
-@Data
+@Getter
+@Setter
 public class BaseTimestamp {
 
     @CreationTimestamp

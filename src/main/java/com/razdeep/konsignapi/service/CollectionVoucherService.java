@@ -7,6 +7,7 @@ import com.razdeep.konsignapi.model.CollectionVoucher;
 import com.razdeep.konsignapi.model.CollectionVoucherItem;
 import com.razdeep.konsignapi.model.PendingBill;
 import com.razdeep.konsignapi.repository.CollectionVoucherRepository;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,13 +61,13 @@ public class CollectionVoucherService {
         collectionVoucherItemEntityList = collectionVoucher.getCollectionVoucherItemList().stream()
                 .map(collectionVoucherItem -> {
                     final var targetBill = billService.getBill(collectionVoucherItem.getBillNo());
-                    final var targetBilEntity = billService.convertBillIntoBillEntity(targetBill);
+                    final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
                     final var collectionVoucherItemId =
                             collectionVoucher.getVoucherNo() + "_" + collectionVoucherItemIndex.getAndIncrement();
                     final var collectionVoucherItemEntity = CollectionVoucherItemEntity.builder()
                             .collectionVoucherItemId(collectionVoucherItemId)
                             .collectionVoucher(collectionVoucherEntity)
-                            .bill(targetBilEntity)
+                            .bill(targetBillEntity)
                             .amountCollected(collectionVoucherItem.getAmountCollected())
                             .bank(collectionVoucherItem.getBank())
                             .ddNo(collectionVoucherItem.getDdNo())
@@ -93,26 +94,26 @@ public class CollectionVoucherService {
         final var collectedAmountSoFar = this.getCollectedAmountInfoForBuyerId(buyerId);
         List<PendingBill> res = new ArrayList<>();
         for (final var billByBuyerId : billsByBuyerId) {
-            if (collectedAmountSoFar.containsKey(billByBuyerId.getBillNo())) {
-                if (billByBuyerId.getBillAmount() > collectedAmountSoFar.get(billByBuyerId.getBillNo())) {
+            if (collectedAmountSoFar.containsKey(billByBuyerId.billNo())) {
+                if (billByBuyerId.billAmount().compareTo(collectedAmountSoFar.get(billByBuyerId.billNo())) > 0) {
                     final var pendingBillAmount =
-                            billByBuyerId.getBillAmount() - collectedAmountSoFar.get(billByBuyerId.getBillNo());
+                            billByBuyerId.billAmount().subtract(collectedAmountSoFar.get(billByBuyerId.billNo()));
                     final var pendingBill = PendingBill.builder()
-                            .billNo(billByBuyerId.getBillNo())
-                            .billAmount(billByBuyerId.getBillAmount())
-                            .buyerName(billByBuyerId.getBuyerName())
-                            .supplierName(billByBuyerId.getSupplierName())
+                            .billNo(billByBuyerId.billNo())
+                            .billAmount(billByBuyerId.billAmount())
+                            .buyerName(billByBuyerId.buyerName())
+                            .supplierName(billByBuyerId.supplierName())
                             .pendingAmount(pendingBillAmount)
                             .build();
                     res.add(pendingBill);
                 }
             } else {
                 final var pendingBill = PendingBill.builder()
-                        .billNo(billByBuyerId.getBillNo())
-                        .billAmount(billByBuyerId.getBillAmount())
-                        .buyerName(billByBuyerId.getBuyerName())
-                        .supplierName(billByBuyerId.getSupplierName())
-                        .pendingAmount(billByBuyerId.getBillAmount())
+                        .billNo(billByBuyerId.billNo())
+                        .billAmount(billByBuyerId.billAmount())
+                        .buyerName(billByBuyerId.buyerName())
+                        .supplierName(billByBuyerId.supplierName())
+                        .pendingAmount(billByBuyerId.billAmount())
                         .build();
                 res.add(pendingBill);
             }
@@ -120,15 +121,15 @@ public class CollectionVoucherService {
         return res;
     }
 
-    private Map<String, Double> getCollectedAmountInfoForBuyerId(String buyerId) {
+    private Map<String, BigDecimal> getCollectedAmountInfoForBuyerId(String buyerId) {
         final var collectionVouchers = collectionVoucherRepository.getCollectedAmountInfoForBuyerId(buyerId);
-        Map<String, Double> res = new HashMap<>();
+        Map<String, BigDecimal> res = new HashMap<>();
 
         for (final var collectionVoucher : collectionVouchers) {
             for (final var collectionVoucherItem : collectionVoucher.getCollectionVoucherItemEntityList()) {
                 if (res.containsKey(collectionVoucherItem.getBill().getBillNo())) {
                     final var newValue = res.get(collectionVoucherItem.getBill().getBillNo())
-                            + collectionVoucherItem.getAmountCollected();
+                            .add(collectionVoucherItem.getAmountCollected());
                     res.put(collectionVoucherItem.getBill().getBillNo(), newValue);
                 } else {
                     res.put(collectionVoucherItem.getBill().getBillNo(), collectionVoucherItem.getAmountCollected());
@@ -139,7 +140,7 @@ public class CollectionVoucherService {
         return res;
     }
 
-    private Double getCollectedAmountForBillNo(String billNo) {
+    private BigDecimal getCollectedAmountForBillNo(String billNo) {
         return collectionVoucherRepository.getCollectedAmountForBillNo(billNo);
     }
 
@@ -156,9 +157,9 @@ public class CollectionVoucherService {
                 .map(collectionVoucherItemEntity -> {
                     final var billNo = collectionVoucherItemEntity.getBill().getBillNo();
                     Bill bill = billService.getBill(billNo);
-                    final var supplierName = bill.getSupplierName();
-                    final var billAmount = bill.getBillAmount();
-                    final var pendingBillAmount = billAmount - getCollectedAmountForBillNo(billNo);
+                    final var supplierName = bill.supplierName();
+                    final var billAmount = bill.billAmount();
+                    final var pendingBillAmount = billAmount.subtract(getCollectedAmountForBillNo(billNo));
                     return CollectionVoucherItem.builder()
                             .billNo(billNo)
                             .supplierName(supplierName)

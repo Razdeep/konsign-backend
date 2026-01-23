@@ -1,7 +1,7 @@
 package com.razdeep.konsignapi.service;
 
 import com.razdeep.konsignapi.constant.KonsignConstant;
-import com.razdeep.konsignapi.entity.KonsignUser;
+import com.razdeep.konsignapi.model.KonsignUserDetails;
 import com.razdeep.konsignapi.token.RefreshTokenGenerator;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.DefaultClaims;
@@ -61,11 +61,9 @@ public class JwtUtilService {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateAccessToken(UserDetails konsignUserDetails) {
+    public String generateAccessToken(KonsignUserDetails konsignUserDetails) {
         Map<String, Object> claims = new HashMap<>();
-        if (konsignUserDetails instanceof KonsignUser) {
-            claims.put(KonsignConstant.JWT_CLAIM_TENANT_ID, ((KonsignUser) konsignUserDetails).getTenantId());
-        }
+        claims.put(KonsignConstant.JWT_CLAIM_TENANT_ID, konsignUserDetails.getTenantId());
 
         claims.put(
                 "roles",

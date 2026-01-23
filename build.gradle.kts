@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.spring.boot.starter.freemarker)
     implementation(libs.openhtml)
+    implementation(libs.spring.boot.starter.validation)
 
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
@@ -51,7 +52,7 @@ dependencies {
     implementation(libs.mapstruct)
     annotationProcessor(libs.mapstruct.processor)
 
-    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+    annotationProcessor(libs.lombok.mapstruct.binding)
 
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.springdoc.openapi.ui)

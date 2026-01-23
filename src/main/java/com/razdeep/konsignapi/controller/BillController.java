@@ -5,6 +5,7 @@ import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.KonsignApiResponse;
 import com.razdeep.konsignapi.service.BillService;
 import io.micrometer.core.annotation.Timed;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -27,34 +28,24 @@ public class BillController {
 
     @Timed
     @PostMapping
-    public ResponseEntity<KonsignApiResponse> addBillEntry(@RequestBody Bill bill) {
-        ResponseEntity<KonsignApiResponse> response;
-        KonsignApiResponse konsignApiResponse = new KonsignApiResponse();
+    public ResponseEntity<KonsignApiResponse> addBillEntry(@Valid @RequestBody Bill bill) {
 
-        if (bill.anyFieldEmpty()) {
-            konsignApiResponse.setMessage("Saving bill failed because all fields are not properly filled");
-            response = new ResponseEntity<>(konsignApiResponse, HttpStatus.NOT_ACCEPTABLE);
-        } else if (billService.enterBill(bill)) {
-            konsignApiResponse.setMessage("Successfully saved bill");
-            response = new ResponseEntity<>(konsignApiResponse, HttpStatus.OK);
-        } else {
-            konsignApiResponse.setMessage("Saving bill failed");
-            response = new ResponseEntity<>(konsignApiResponse, HttpStatus.NOT_ACCEPTABLE);
-        }
-        return response;
+        billService.addBill(bill);
+        KonsignApiResponse konsignApiResponse = KonsignApiResponse.builder()
+                .message("Successfully saved bill")
+                .success(true)
+                .build();
+
+        return ResponseEntity.ok(konsignApiResponse);
     }
 
     @Timed
     @GetMapping("/{billNo}")
     public ResponseEntity<KonsignApiResponse> getBill(@PathVariable String billNo) {
         final var bill = billService.getBill(billNo);
-        KonsignApiResponse konsignApiResponse = new KonsignApiResponse();
-        if (bill == null) {
-            konsignApiResponse.setMessage("Bill not found");
-            return new ResponseEntity<>(konsignApiResponse, HttpStatus.NOT_FOUND);
-        }
-        konsignApiResponse.setData(bill);
-        return new ResponseEntity<>(konsignApiResponse, HttpStatus.OK);
+        KonsignApiResponse konsignApiResponse =
+                KonsignApiResponse.builder().success(true).data(bill).build();
+        return ResponseEntity.ok(konsignApiResponse);
     }
 
     @Timed
@@ -66,13 +57,8 @@ public class BillController {
         final var bills = billService.getAllBills(offset, pageSize);
         stopWatch.stop();
         LOG.info("billEntryService.getAllBills() took {} ms", stopWatch.getLastTaskTimeMillis());
-        KonsignApiResponse konsignApiResponse = new KonsignApiResponse();
-        if (bills == null) {
-            konsignApiResponse.setMessage("Bill not found");
-            return new ResponseEntity<>(konsignApiResponse, HttpStatus.NOT_FOUND);
-        }
-        konsignApiResponse.setData(bills);
-        return new ResponseEntity<>(konsignApiResponse, HttpStatus.OK);
+        return new ResponseEntity<>(
+                KonsignApiResponse.builder().success(true).data(bills).build(), HttpStatus.OK);
     }
 
     @Timed

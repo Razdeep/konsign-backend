@@ -8,7 +8,6 @@ import com.razdeep.konsignapi.token.RefreshTokenGenerator;
 import jakarta.transaction.Transactional;
 import java.time.Instant;
 import java.util.Date;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -45,7 +44,7 @@ public class RefreshTokenService {
             throw new UnauthorizedException("Refresh token expired");
         }
 
-        final UserDetails konsignUserDetails = konsignUserDetailsService.loadUserByUserId(oldToken.getUserId());
+        final KonsignUserDetails konsignUserDetails = konsignUserDetailsService.loadUserByUserId(oldToken.getUserId());
 
         return jwtUtilService.generateAccessToken(konsignUserDetails);
     }

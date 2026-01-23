@@ -1,6 +1,7 @@
 package com.razdeep.konsignapi.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.*;
@@ -31,7 +32,9 @@ public class BillEntity extends BaseTimestamp {
     private TransportEntity transportEntity;
 
     private LocalDate lrDate;
-    private Double billAmount;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal billAmount;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "billEntry")
     private List<LrPmEntity> lrPmEntityList;
