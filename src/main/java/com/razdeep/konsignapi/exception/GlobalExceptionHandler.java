@@ -1,11 +1,14 @@
 package com.razdeep.konsignapi.exception;
 
 import com.razdeep.konsignapi.model.KonsignApiResponse;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -55,5 +58,21 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new KonsignApiResponse(false, "An unexpected error occurred", null));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<KonsignApiResponse> handleValidationErrors(MethodArgumentNotValidException ex) {
+
+        List<String> missingFields = new ArrayList<>();
+
+        ex.getBindingResult().getFieldErrors().forEach(error -> missingFields.add(error.getField()));
+
+        String message = String.join(",", missingFields) + " not properly passed";
+
+        return ResponseEntity.badRequest()
+                .body(KonsignApiResponse.builder()
+                        .success(false)
+                        .message(message)
+                        .build());
     }
 }

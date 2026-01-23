@@ -42,8 +42,7 @@ public class AuthenticationController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
-        authenticationResponse.setAccessToken(tokenPair.accessToken());
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse(tokenPair.accessToken());
 
         return ResponseEntity.ok(KonsignApiResponse.builder()
                 .success(true)

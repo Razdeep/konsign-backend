@@ -1,5 +1,6 @@
 package com.razdeep.konsignapi.model;
 
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,6 @@ public class PendingBill {
     String billNo;
     String supplierName;
     String buyerName;
-    Double billAmount;
-    Double pendingAmount;
+    BigDecimal billAmount;
+    BigDecimal pendingAmount;
 }

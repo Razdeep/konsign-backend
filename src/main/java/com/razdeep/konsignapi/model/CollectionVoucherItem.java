@@ -1,5 +1,6 @@
 package com.razdeep.konsignapi.model;
 
+import java.math.BigDecimal;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,11 +12,11 @@ public class CollectionVoucherItem {
 
     String supplierName;
 
-    Double billAmount;
+    BigDecimal billAmount;
 
-    Double pendingBillAmount;
+    BigDecimal pendingBillAmount;
 
-    Double amountCollected;
+    BigDecimal amountCollected;
 
     String bank;
 

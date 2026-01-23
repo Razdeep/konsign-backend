@@ -31,10 +31,7 @@ public class BillController {
         ResponseEntity<KonsignApiResponse> response;
         KonsignApiResponse konsignApiResponse = new KonsignApiResponse();
 
-        if (bill.anyFieldEmpty()) {
-            konsignApiResponse.setMessage("Saving bill failed because all fields are not properly filled");
-            response = new ResponseEntity<>(konsignApiResponse, HttpStatus.NOT_ACCEPTABLE);
-        } else if (billService.enterBill(bill)) {
+        if (billService.enterBill(bill)) {
             konsignApiResponse.setMessage("Successfully saved bill");
             response = new ResponseEntity<>(konsignApiResponse, HttpStatus.OK);
         } else {

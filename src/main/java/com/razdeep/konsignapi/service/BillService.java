@@ -4,13 +4,11 @@ import com.razdeep.konsignapi.entity.*;
 import com.razdeep.konsignapi.mapper.BillMapper;
 import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.CustomPageImpl;
-import com.razdeep.konsignapi.model.LrPm;
 import com.razdeep.konsignapi.repository.BillEntryRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.mapstruct.factory.Mappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -38,48 +36,44 @@ public class BillService {
             SupplierService supplierService,
             TransportService transportService,
             CommonService commonService,
-            BillEntryRepository billEntryRepository) {
+            BillEntryRepository billEntryRepository,
+            BillMapper billMapper) {
         this.buyerService = buyerService;
         this.supplierService = supplierService;
         this.transportService = transportService;
         this.commonService = commonService;
         this.billEntryRepository = billEntryRepository;
-        this.billMapper = Mappers.getMapper(BillMapper.class);
+        this.billMapper = billMapper;
     }
 
-    //    @Caching(
-    //            evict = {
-    //                @CacheEvict(value = "getAllBills", allEntries = true),
-    //                @CacheEvict(value = "getBill", key = "#bill.billNo")
-    //            })
     public boolean enterBill(Bill bill) {
 
         final var agencyId = commonService.getTenantId();
 
-        BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
-        SupplierEntity supplierEntity = supplierService.getSupplierBySupplierName(bill.getSupplierName());
-        TransportEntity transportEntity = transportService.getTransportByTransportName(bill.getTransportName());
+        BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(bill.buyerName());
+        SupplierEntity supplierEntity = supplierService.getSupplierBySupplierName(bill.supplierName());
+        TransportEntity transportEntity = transportService.getTransportByTransportName(bill.transportName());
 
-        if (buyerEntity == null || supplierEntity == null || transportEntity == null || bill.getLrPmList() == null) {
+        if (buyerEntity == null || supplierEntity == null || transportEntity == null || bill.lrPmList() == null) {
             return false;
         }
 
         BillEntity billEntity = BillEntity.builder()
                 .buyerEntity(buyerEntity)
-                .billNo(bill.getBillNo())
-                .billAmount(bill.getBillAmount())
-                .billDate(bill.getBillDate())
-                .lrDate(bill.getLrDate())
+                .billNo(bill.billNo())
+                .billAmount(bill.billAmount())
+                .billDate(bill.billDate())
+                .lrDate(bill.lrDate())
                 .supplierEntity(supplierEntity)
                 .transportEntity(transportEntity)
                 .build();
 
         AtomicInteger lr_pm_index = new AtomicInteger();
 
-        List<LrPmEntity> lrPmEntityList = bill.getLrPmList().stream()
+        List<LrPmEntity> lrPmEntityList = bill.lrPmList().stream()
                 .map(lrPm -> {
                     LrPmEntity lrPmEntity = new LrPmEntity(lrPm);
-                    lrPmEntity.setLrPmId(bill.getBillNo() + "_" + lr_pm_index.getAndIncrement());
+                    lrPmEntity.setLrPmId(bill.billNo() + "_" + lr_pm_index.getAndIncrement());
                     lrPmEntity.setBillEntry(billEntity);
                     lrPmEntity.setTenantId(agencyId);
                     return lrPmEntity;
@@ -98,7 +92,6 @@ public class BillService {
         return getBill(billNo, agencyId);
     }
 
-    //    @Cacheable(value = "getBill", key = "#billNo.concat(#agencyId)")
     public Bill getBill(String billNo, String agencyId) {
 
         final var billEntryOptional = billEntryRepository.findByBillNoAndTenantId(billNo, agencyId);
@@ -107,29 +100,9 @@ public class BillService {
         }
         final var billEntry = billEntryOptional.get();
 
-        List<LrPm> lrPmList = billEntry.getLrPmEntityList().stream()
-                .map((lrPmEntity -> new LrPm(lrPmEntity.getLr(), lrPmEntity.getPm())))
-                .collect(Collectors.toList());
-
-        return Bill.builder()
-                .billNo(billEntry.getBillNo())
-                .billAmount(billEntry.getBillAmount())
-                .billDate(billEntry.getBillDate())
-                .buyerName(billEntry.getBuyerEntity().getBuyerName())
-                .supplierName(billEntry.getSupplierEntity().getSupplierName())
-                .transportName(billEntry.getTransportEntity().getTransportName())
-                .lrPmList(lrPmList)
-                .lrDate(billEntry.getLrDate())
-                .build();
-
-        //        return billMapper.billEntityToBill(billEntry);
+        return billMapper.toModel(billEntry);
     }
 
-    //    @Caching(
-    //            evict = {
-    //                @CacheEvict(value = "getAllBills", allEntries = true),
-    //                @CacheEvict(value = "getBill", key = "#bill.billNo")
-    //            })
     public boolean deleteBill(String billNo) {
         boolean wasPresent = false;
         if (billEntryRepository.findById(billNo).isPresent()) {
@@ -141,26 +114,25 @@ public class BillService {
 
     public List<Bill> getBillsByBuyerId(String buyerId) {
         List<BillEntity> billEntityList = billEntryRepository.findAllBillsByBuyerId(buyerId);
-        return billEntityList.stream().map(Bill::new).collect(Collectors.toList());
+        return billEntityList.stream().map(billMapper::toModel).collect(Collectors.toList());
     }
 
     public BillEntity convertBillIntoBillEntity(Bill bill) {
-        final var targetSupplierEntity = supplierService.getSupplierBySupplierName(bill.getSupplierName());
-        final var targetBuyerEntity = buyerService.getBuyerByBuyerName(bill.getBuyerName());
-        final var targetTransportEntity = transportService.getTransportByTransportName(bill.getTransportName());
+        final var targetSupplierEntity = supplierService.getSupplierBySupplierName(bill.supplierName());
+        final var targetBuyerEntity = buyerService.getBuyerByBuyerName(bill.buyerName());
+        final var targetTransportEntity = transportService.getTransportByTransportName(bill.transportName());
         List<LrPmEntity> targetLrPmEntityList = new ArrayList<>();
-        if (bill.getLrPmList() != null) {
-            targetLrPmEntityList =
-                    bill.getLrPmList().stream().map(LrPmEntity::new).collect(Collectors.toList());
+        if (bill.lrPmList() != null) {
+            targetLrPmEntityList = bill.lrPmList().stream().map(LrPmEntity::new).collect(Collectors.toList());
         }
         return BillEntity.builder()
-                .billNo(bill.getBillNo())
+                .billNo(bill.billNo())
                 .supplierEntity(targetSupplierEntity)
                 .buyerEntity(targetBuyerEntity)
-                .billDate(bill.getBillDate())
+                .billDate(bill.billDate())
                 .transportEntity(targetTransportEntity)
-                .lrDate(bill.getLrDate())
-                .billAmount(bill.getBillAmount())
+                .lrDate(bill.lrDate())
+                .billAmount(bill.billAmount())
                 .lrPmEntityList(targetLrPmEntityList)
                 .build();
     }
@@ -170,7 +142,6 @@ public class BillService {
         return getAllBills(offset, size, agencyId);
     }
 
-    //    @Cacheable(value = "getAllBills", key = "{#offset,#size,#agencyId}")
     public CustomPageImpl<Bill> getAllBills(int offset, int size, String agencyId) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -180,13 +151,13 @@ public class BillService {
         LOG.info("repository call took {} ms", stopWatch.getLastTaskTimeMillis());
 
         stopWatch.start();
-        final var billList = billEntityPages.stream().map(Bill::new).collect(Collectors.toList());
+        final var billList = billEntityPages.stream().map(billMapper::toModel).collect(Collectors.toList());
         stopWatch.stop();
         LOG.info("repository stream api conversion took {} ms", stopWatch.getLastTaskTimeMillis());
 
         final var pageNumber = billEntityPages.getPageable().getPageNumber();
         final var pageSize = billEntityPages.getPageable().getPageSize();
 
-        return new CustomPageImpl<Bill>(billList, pageNumber, pageSize, billEntityPages.getTotalElements());
+        return new CustomPageImpl<>(billList, pageNumber, pageSize, billEntityPages.getTotalElements());
     }
 }

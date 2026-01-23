@@ -1,6 +1,7 @@
 package com.razdeep.konsignapi.repository;
 
 import com.razdeep.konsignapi.entity.CollectionVoucherEntity;
+import java.math.BigDecimal;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,7 @@ public interface CollectionVoucherRepository extends JpaRepository<CollectionVou
     @Query(
             value = "select sum(amount_collected) " + "from collection_voucher_item where bill_bill_no = ?1",
             nativeQuery = true)
-    Double getCollectedAmountForBillNo(String BillNo);
+    BigDecimal getCollectedAmountForBillNo(String BillNo);
 
     CollectionVoucherEntity getCollectionVoucherByVoucherNo(String voucherNo);
 }
