@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.coyote.BadRequestException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -61,8 +62,15 @@ public class CollectionVoucherService {
         return wasPresent;
     }
 
-    public List<PendingBill> getPendingBillsToBeCollected(String buyerId) {
-        List<Bill> billsByBuyerId = billService.getBillsByBuyerId(buyerId);
+    public List<PendingBill> getPendingBillsToBeCollected(String buyerId, String buyerName) throws BadRequestException {
+
+        if ((buyerName == null || buyerName.isEmpty()) && (buyerId == null || buyerId.isEmpty())) {
+            throw new BadRequestException("buyerName and buyerId is empty");
+        }
+
+        List<Bill> billsByBuyerId =
+                !buyerId.isEmpty() ? billService.getBillsByBuyerId(buyerId) : billService.getBillsByBuyerId(buyerName);
+
         final var collectedAmountSoFar = this.getCollectedAmountInfoForBuyerId(buyerId);
         List<PendingBill> res = new ArrayList<>();
         for (final var billByBuyerId : billsByBuyerId) {

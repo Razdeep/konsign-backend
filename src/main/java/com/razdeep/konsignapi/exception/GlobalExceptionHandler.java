@@ -3,6 +3,7 @@ package com.razdeep.konsignapi.exception;
 import com.razdeep.konsignapi.model.KonsignApiResponse;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -88,6 +89,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<KonsignApiResponse> handleValidationErrors(SaveResourceException ex) {
 
         LOG.info("Resource could not be saved", ex);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new KonsignApiResponse(false, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<KonsignApiResponse> handleValidationErrors(BadRequestException ex) {
+
+        LOG.info("Bad request exception", ex);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new KonsignApiResponse(false, ex.getMessage(), null));
     }
