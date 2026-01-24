@@ -16,5 +16,9 @@ public interface CollectionVoucherItemMapper {
     @Mapping(source = "bill.billAmount", target = "billAmount")
     CollectionVoucherItem toModel(CollectionVoucherItemEntity entity);
 
-    List<CollectionVoucherItem> toEntityList(List<CollectionVoucherItemEntity> entities);
+    List<CollectionVoucherItem> toModelList(List<CollectionVoucherItemEntity> entities);
+
+    CollectionVoucherItemEntity toEntity(CollectionVoucherItem model);
+
+    List<CollectionVoucherItemEntity> toEntityList(List<CollectionVoucherItem> model);
 }

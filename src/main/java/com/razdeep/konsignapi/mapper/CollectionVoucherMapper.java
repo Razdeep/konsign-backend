@@ -13,4 +13,7 @@ public interface CollectionVoucherMapper {
     @Mapping(source = "buyer.buyerName", target = "buyerName")
     @Mapping(source = "collectionVoucherItemEntityList", target = "collectionVoucherItemList")
     CollectionVoucher toModel(CollectionVoucherEntity entity);
+
+    @Mapping(source = "collectionVoucherItemList", target = "collectionVoucherItemEntityList")
+    CollectionVoucherEntity toEntity(CollectionVoucher model);
 }

@@ -1,7 +1,7 @@
 package com.razdeep.konsignapi.service;
 
+import com.razdeep.konsignapi.entity.BuyerEntity;
 import com.razdeep.konsignapi.entity.CollectionVoucherEntity;
-import com.razdeep.konsignapi.entity.CollectionVoucherItemEntity;
 import com.razdeep.konsignapi.exception.ResourceNotFoundException;
 import com.razdeep.konsignapi.mapper.CollectionVoucherMapper;
 import com.razdeep.konsignapi.model.Bill;
@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -43,43 +41,51 @@ public class CollectionVoucherService {
 
     public void addCollectionVoucher(CollectionVoucher collectionVoucher) {
 
-        final var agencyId = commonService.getTenantId();
-
-        CollectionVoucherEntity collectionVoucherEntity = CollectionVoucherEntity.builder()
-                .voucherNo(collectionVoucher.getVoucherNo())
-                .voucherDate(collectionVoucher.getVoucherDate())
-                .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
-                .build();
-
-        collectionVoucherEntity.setTenantId(agencyId);
-
+        //        final var agencyId = commonService.getTenantId();
         //
+        //        CollectionVoucherEntity collectionVoucherEntity = CollectionVoucherEntity.builder()
+        //                .voucherNo(collectionVoucher.getVoucherNo())
+        //                .voucherDate(collectionVoucher.getVoucherDate())
+        //                .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
+        //                .build();
+        //
+        //        collectionVoucherEntity.setTenantId(agencyId);
+        //
+        //        //
+        //        //
         // collectionVoucherEntity.setCreationTimestamp(getVoucherByVoucherNo(collectionVoucher.getVoucherNo()));
+        //
+        //        List<CollectionVoucherItemEntity> collectionVoucherItemEntityList;
+        //        AtomicInteger collectionVoucherItemIndex = new AtomicInteger();
+        //
+        //        collectionVoucherItemEntityList = collectionVoucher.getCollectionVoucherItemList().stream()
+        //                .map(collectionVoucherItem -> {
+        //                    final var targetBill = billService.getBill(collectionVoucherItem.getBillNo());
+        //                    final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
+        //                    final var collectionVoucherItemId =
+        //                            collectionVoucher.getVoucherNo() + "_" +
+        // collectionVoucherItemIndex.getAndIncrement();
+        //                    final var collectionVoucherItemEntity = CollectionVoucherItemEntity.builder()
+        //                            .collectionVoucherItemId(collectionVoucherItemId)
+        //                            .collectionVoucher(collectionVoucherEntity)
+        //                            .bill(targetBillEntity)
+        //                            .amountCollected(collectionVoucherItem.getAmountCollected())
+        //                            .bank(collectionVoucherItem.getBank())
+        //                            .ddNo(collectionVoucherItem.getDdNo())
+        //                            .ddDate(collectionVoucherItem.getDdDate())
+        //                            .build();
+        //                    collectionVoucherItemEntity.setTenantId(agencyId);
+        //                    return collectionVoucherItemEntity;
+        //                })
+        //                .collect(Collectors.toList());
+        //
+        //        collectionVoucherEntity.setCollectionVoucherItemEntityList(collectionVoucherItemEntityList);
 
-        List<CollectionVoucherItemEntity> collectionVoucherItemEntityList;
-        AtomicInteger collectionVoucherItemIndex = new AtomicInteger();
+        BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName());
 
-        collectionVoucherItemEntityList = collectionVoucher.getCollectionVoucherItemList().stream()
-                .map(collectionVoucherItem -> {
-                    final var targetBill = billService.getBill(collectionVoucherItem.getBillNo());
-                    final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
-                    final var collectionVoucherItemId =
-                            collectionVoucher.getVoucherNo() + "_" + collectionVoucherItemIndex.getAndIncrement();
-                    final var collectionVoucherItemEntity = CollectionVoucherItemEntity.builder()
-                            .collectionVoucherItemId(collectionVoucherItemId)
-                            .collectionVoucher(collectionVoucherEntity)
-                            .bill(targetBillEntity)
-                            .amountCollected(collectionVoucherItem.getAmountCollected())
-                            .bank(collectionVoucherItem.getBank())
-                            .ddNo(collectionVoucherItem.getDdNo())
-                            .ddDate(collectionVoucherItem.getDdDate())
-                            .build();
-                    collectionVoucherItemEntity.setTenantId(agencyId);
-                    return collectionVoucherItemEntity;
-                })
-                .collect(Collectors.toList());
+        CollectionVoucherEntity collectionVoucherEntity = collectionVoucherMapper.toEntity(collectionVoucher);
+        collectionVoucherEntity.setBuyer(buyerEntity);
 
-        collectionVoucherEntity.setCollectionVoucherItemEntityList(collectionVoucherItemEntityList);
         collectionVoucherRepository.save(collectionVoucherEntity);
     }
 
