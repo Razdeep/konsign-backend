@@ -23,68 +23,34 @@ public class CollectionVoucherService {
     private final CollectionVoucherRepository collectionVoucherRepository;
     private final BuyerService buyerService;
     private final BillService billService;
-    private final CommonService commonService;
     private final CollectionVoucherMapper collectionVoucherMapper;
 
     public CollectionVoucherService(
             CollectionVoucherRepository collectionVoucherRepository,
             BuyerService buyerService,
             BillService billService,
-            CommonService commonService,
             CollectionVoucherMapper collectionVoucherMapper) {
         this.collectionVoucherRepository = collectionVoucherRepository;
         this.buyerService = buyerService;
         this.billService = billService;
-        this.commonService = commonService;
         this.collectionVoucherMapper = collectionVoucherMapper;
     }
 
     public void addCollectionVoucher(CollectionVoucher collectionVoucher) {
 
-        //        final var agencyId = commonService.getTenantId();
-        //
-        //        CollectionVoucherEntity collectionVoucherEntity = CollectionVoucherEntity.builder()
-        //                .voucherNo(collectionVoucher.getVoucherNo())
-        //                .voucherDate(collectionVoucher.getVoucherDate())
-        //                .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
-        //                .build();
-        //
-        //        collectionVoucherEntity.setTenantId(agencyId);
-        //
-        //        //
-        //        //
-        // collectionVoucherEntity.setCreationTimestamp(getVoucherByVoucherNo(collectionVoucher.getVoucherNo()));
-        //
-        //        List<CollectionVoucherItemEntity> collectionVoucherItemEntityList;
-        //        AtomicInteger collectionVoucherItemIndex = new AtomicInteger();
-        //
-        //        collectionVoucherItemEntityList = collectionVoucher.getCollectionVoucherItemList().stream()
-        //                .map(collectionVoucherItem -> {
-        //                    final var targetBill = billService.getBill(collectionVoucherItem.getBillNo());
-        //                    final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
-        //                    final var collectionVoucherItemId =
-        //                            collectionVoucher.getVoucherNo() + "_" +
-        // collectionVoucherItemIndex.getAndIncrement();
-        //                    final var collectionVoucherItemEntity = CollectionVoucherItemEntity.builder()
-        //                            .collectionVoucherItemId(collectionVoucherItemId)
-        //                            .collectionVoucher(collectionVoucherEntity)
-        //                            .bill(targetBillEntity)
-        //                            .amountCollected(collectionVoucherItem.getAmountCollected())
-        //                            .bank(collectionVoucherItem.getBank())
-        //                            .ddNo(collectionVoucherItem.getDdNo())
-        //                            .ddDate(collectionVoucherItem.getDdDate())
-        //                            .build();
-        //                    collectionVoucherItemEntity.setTenantId(agencyId);
-        //                    return collectionVoucherItemEntity;
-        //                })
-        //                .collect(Collectors.toList());
-        //
-        //        collectionVoucherEntity.setCollectionVoucherItemEntityList(collectionVoucherItemEntityList);
-
         BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName());
 
         CollectionVoucherEntity collectionVoucherEntity = collectionVoucherMapper.toEntity(collectionVoucher);
         collectionVoucherEntity.setBuyer(buyerEntity);
+
+        final var collectionVoucherItemEntityList = collectionVoucherEntity.getCollectionVoucherItemEntityList();
+        final var collectionVoucherItemList = collectionVoucher.getCollectionVoucherItemList();
+        for (int i = 0; i < collectionVoucherItemList.size(); ++i) {
+            final var targetBill =
+                    billService.getBill(collectionVoucherItemList.get(i).getBillNo());
+            final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
+            collectionVoucherItemEntityList.get(i).setBill(targetBillEntity);
+        }
 
         collectionVoucherRepository.save(collectionVoucherEntity);
     }
