@@ -3,7 +3,6 @@ springboot = "3.0.6"
 jjwt = "0.9.1"
 jaxb = "2.4.0-b180830.0359"
 postgres = "42.7.8"
-gson = "2.10"
 lombok = "1.18.30" # put actual version you use
 lombokmapstruct = "0.2.0"
 mapstruct = "1.6.3"
@@ -29,7 +28,6 @@ spring-boot-starter-validation = { module = "org.springframework.boot:spring-boo
 jjwt = { module = "io.jsonwebtoken:jjwt", version.ref = "jjwt" }
 jaxb-api = { module = "javax.xml.bind:jaxb-api", version.ref = "jaxb" }
 postgres-connector = { module = "org.postgresql:postgresql", version.ref = "postgres" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 lombok-mapstruct-binding = { module = "org.projectlombok:lombok-mapstruct-binding", version.ref = "lombokmapstruct" }
 

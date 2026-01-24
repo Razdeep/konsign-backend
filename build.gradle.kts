@@ -41,7 +41,6 @@ dependencies {
     implementation(libs.jaxb.api)
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.postgres.connector)
-    implementation(libs.gson)
     implementation(libs.spring.boot.starter.freemarker)
     implementation(libs.openhtml)
     implementation(libs.spring.boot.starter.validation)

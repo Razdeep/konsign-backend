@@ -54,7 +54,7 @@ public class AuthenticationService {
                 authenticationRequest.username(), authenticationRequest.password()));
 
         final KonsignUserDetails konsignUserDetails =
-                (KonsignUserDetails) konsignUserDetailsService.loadUserByUsername(authenticationRequest.username());
+                konsignUserDetailsService.loadUserByUsername(authenticationRequest.username());
 
         final String accessToken = jwtUtilService.generateAccessToken(konsignUserDetails);
 

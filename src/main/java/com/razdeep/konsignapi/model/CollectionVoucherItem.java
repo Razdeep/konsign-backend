@@ -1,27 +1,41 @@
 package com.razdeep.konsignapi.model;
 
+import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @Builder
 public class CollectionVoucherItem {
 
-    String billNo;
+    @NotBlank(message = "Bill number must not be blank")
+    @Size(max = 10, message = "Bill number must be at most 10 characters")
+    private String billNo;
 
-    String supplierName;
+    @NotBlank(message = "Supplier name must not be blank")
+    @Size(max = 30, message = "Supplier name must be at most 30 characters")
+    private String supplierName;
 
-    BigDecimal billAmount;
+    @NotNull(message = "Bill amount is required")
+    @Positive(message = "Bill amount must be greater than zero")
+    private BigDecimal billAmount;
 
-    BigDecimal pendingBillAmount;
+    private BigDecimal pendingBillAmount;
 
-    BigDecimal amountCollected;
+    @NotNull(message = "Collected amount is required")
+    @PositiveOrZero(message = "Collected amount cannot be negative")
+    private BigDecimal amountCollected;
 
-    String bank;
+    @Size(max = 10, message = "Bank name must be at most 10 characters")
+    private String bank;
 
-    String ddNo;
+    @Size(max = 10, message = "DD number must be at most 10 characters")
+    private String ddNo;
 
-    //    @JsonFormat(pattern="yyyy-MM-dd")
-    String ddDate;
+    @NotNull(message = "dd date is required")
+    private LocalDate ddDate;
 }

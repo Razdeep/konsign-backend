@@ -1,20 +1,20 @@
 package com.razdeep.konsignapi.service;
 
+import com.razdeep.konsignapi.entity.BuyerEntity;
 import com.razdeep.konsignapi.entity.CollectionVoucherEntity;
-import com.razdeep.konsignapi.entity.CollectionVoucherItemEntity;
+import com.razdeep.konsignapi.exception.ResourceNotFoundException;
+import com.razdeep.konsignapi.mapper.CollectionVoucherMapper;
 import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.CollectionVoucher;
 import com.razdeep.konsignapi.model.CollectionVoucherItem;
 import com.razdeep.konsignapi.model.PendingBill;
 import com.razdeep.konsignapi.repository.CollectionVoucherRepository;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import org.apache.coyote.BadRequestException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -24,63 +24,36 @@ public class CollectionVoucherService {
     private final CollectionVoucherRepository collectionVoucherRepository;
     private final BuyerService buyerService;
     private final BillService billService;
-    private final CommonService commonService;
+    private final CollectionVoucherMapper collectionVoucherMapper;
 
     public CollectionVoucherService(
             CollectionVoucherRepository collectionVoucherRepository,
             BuyerService buyerService,
             BillService billService,
-            CommonService commonService) {
+            CollectionVoucherMapper collectionVoucherMapper) {
         this.collectionVoucherRepository = collectionVoucherRepository;
         this.buyerService = buyerService;
         this.billService = billService;
-        this.commonService = commonService;
+        this.collectionVoucherMapper = collectionVoucherMapper;
     }
 
-    public boolean addCollectionVoucher(CollectionVoucher collectionVoucher) {
-        if (collectionVoucher.getCollectionVoucherItemList() == null) {
-            return false;
+    public void addCollectionVoucher(CollectionVoucher collectionVoucher) {
+
+        BuyerEntity buyerEntity = buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName());
+
+        CollectionVoucherEntity collectionVoucherEntity = collectionVoucherMapper.toEntity(collectionVoucher);
+        collectionVoucherEntity.setBuyer(buyerEntity);
+
+        final var collectionVoucherItemEntityList = collectionVoucherEntity.getCollectionVoucherItemEntityList();
+        final var collectionVoucherItemList = collectionVoucher.getCollectionVoucherItemList();
+        for (int i = 0; i < collectionVoucherItemList.size(); ++i) {
+            final var targetBill =
+                    billService.getBill(collectionVoucherItemList.get(i).getBillNo());
+            final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
+            collectionVoucherItemEntityList.get(i).setBill(targetBillEntity);
         }
 
-        final var agencyId = commonService.getTenantId();
-
-        CollectionVoucherEntity collectionVoucherEntity = CollectionVoucherEntity.builder()
-                .voucherNo(collectionVoucher.getVoucherNo())
-                .voucherDate(LocalDate.parse(collectionVoucher.getVoucherDate()))
-                .buyer(buyerService.getBuyerByBuyerName(collectionVoucher.getBuyerName()))
-                .build();
-
-        collectionVoucherEntity.setTenantId(agencyId);
-
-        //
-        // collectionVoucherEntity.setCreationTimestamp(getVoucherByVoucherNo(collectionVoucher.getVoucherNo()));
-
-        List<CollectionVoucherItemEntity> collectionVoucherItemEntityList;
-        AtomicInteger collectionVoucherItemIndex = new AtomicInteger();
-
-        collectionVoucherItemEntityList = collectionVoucher.getCollectionVoucherItemList().stream()
-                .map(collectionVoucherItem -> {
-                    final var targetBill = billService.getBill(collectionVoucherItem.getBillNo());
-                    final var targetBillEntity = billService.convertBillIntoBillEntity(targetBill);
-                    final var collectionVoucherItemId =
-                            collectionVoucher.getVoucherNo() + "_" + collectionVoucherItemIndex.getAndIncrement();
-                    final var collectionVoucherItemEntity = CollectionVoucherItemEntity.builder()
-                            .collectionVoucherItemId(collectionVoucherItemId)
-                            .collectionVoucher(collectionVoucherEntity)
-                            .bill(targetBillEntity)
-                            .amountCollected(collectionVoucherItem.getAmountCollected())
-                            .bank(collectionVoucherItem.getBank())
-                            .ddNo(collectionVoucherItem.getDdNo())
-                            .ddDate(LocalDate.parse(collectionVoucherItem.getDdDate()))
-                            .build();
-                    collectionVoucherItemEntity.setTenantId(agencyId);
-                    return collectionVoucherItemEntity;
-                })
-                .collect(Collectors.toList());
-
-        collectionVoucherEntity.setCollectionVoucherItemEntityList(collectionVoucherItemEntityList);
         collectionVoucherRepository.save(collectionVoucherEntity);
-        return true;
     }
 
     public boolean deleteVoucher(String voucherNo) {
@@ -89,8 +62,15 @@ public class CollectionVoucherService {
         return wasPresent;
     }
 
-    public List<PendingBill> getPendingBillsToBeCollected(String buyerId) {
-        List<Bill> billsByBuyerId = billService.getBillsByBuyerId(buyerId);
+    public List<PendingBill> getPendingBillsToBeCollected(String buyerId, String buyerName) throws BadRequestException {
+
+        if ((buyerName == null || buyerName.isEmpty()) && (buyerId == null || buyerId.isEmpty())) {
+            throw new BadRequestException("buyerName and buyerId is empty");
+        }
+
+        List<Bill> billsByBuyerId =
+                !buyerId.isEmpty() ? billService.getBillsByBuyerId(buyerId) : billService.getBillsByBuyerId(buyerName);
+
         final var collectedAmountSoFar = this.getCollectedAmountInfoForBuyerId(buyerId);
         List<PendingBill> res = new ArrayList<>();
         for (final var billByBuyerId : billsByBuyerId) {
@@ -144,40 +124,29 @@ public class CollectionVoucherService {
         return collectionVoucherRepository.getCollectedAmountForBillNo(billNo);
     }
 
+    private CollectionVoucherItem enrichWithPendingAmount(CollectionVoucherItem collectionVoucherItem) {
+        String billNo = collectionVoucherItem.getBillNo();
+        BigDecimal billAmount = collectionVoucherItem.getBillAmount();
+        BigDecimal getCollectedAmount = getCollectedAmountForBillNo(billNo);
+        BigDecimal pendingAmount = billAmount.subtract(getCollectedAmount);
+        collectionVoucherItem.setPendingBillAmount(pendingAmount);
+        return collectionVoucherItem;
+    }
+
     @Nullable
     public CollectionVoucher getVoucherByVoucherNo(String voucherNo) {
         CollectionVoucherEntity collectionVoucherEntity =
                 collectionVoucherRepository.getCollectionVoucherByVoucherNo(voucherNo);
 
         if (collectionVoucherEntity == null) {
-            return null;
+            throw new ResourceNotFoundException("Collection Voucher " + voucherNo + " Not Found");
         }
 
-        final var collectionVoucherItemList = collectionVoucherEntity.getCollectionVoucherItemEntityList().stream()
-                .map(collectionVoucherItemEntity -> {
-                    final var billNo = collectionVoucherItemEntity.getBill().getBillNo();
-                    Bill bill = billService.getBill(billNo);
-                    final var supplierName = bill.supplierName();
-                    final var billAmount = bill.billAmount();
-                    final var pendingBillAmount = billAmount.subtract(getCollectedAmountForBillNo(billNo));
-                    return CollectionVoucherItem.builder()
-                            .billNo(billNo)
-                            .supplierName(supplierName)
-                            .billAmount(billAmount)
-                            .pendingBillAmount(pendingBillAmount)
-                            .amountCollected(collectionVoucherItemEntity.getAmountCollected())
-                            .bank(collectionVoucherItemEntity.getBank())
-                            .ddNo(collectionVoucherItemEntity.getDdNo())
-                            .ddDate(String.valueOf(collectionVoucherItemEntity.getDdDate()))
-                            .build();
-                })
-                .collect(Collectors.toList());
+        CollectionVoucher collectionVoucher = collectionVoucherMapper.toModel(collectionVoucherEntity);
+        collectionVoucher.setCollectionVoucherItemList(collectionVoucher.getCollectionVoucherItemList().stream()
+                .map(this::enrichWithPendingAmount)
+                .toList());
 
-        return CollectionVoucher.builder()
-                .voucherNo(collectionVoucherEntity.getVoucherNo())
-                .voucherDate(String.valueOf(collectionVoucherEntity.getVoucherDate()))
-                .buyerName(collectionVoucherEntity.getBuyer().getBuyerName())
-                .collectionVoucherItemList(collectionVoucherItemList)
-                .build();
+        return collectionVoucher;
     }
 }
