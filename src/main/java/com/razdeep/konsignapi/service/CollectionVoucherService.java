@@ -2,6 +2,8 @@ package com.razdeep.konsignapi.service;
 
 import com.razdeep.konsignapi.entity.CollectionVoucherEntity;
 import com.razdeep.konsignapi.entity.CollectionVoucherItemEntity;
+import com.razdeep.konsignapi.exception.ResourceNotFoundException;
+import com.razdeep.konsignapi.mapper.CollectionVoucherMapper;
 import com.razdeep.konsignapi.model.Bill;
 import com.razdeep.konsignapi.model.CollectionVoucher;
 import com.razdeep.konsignapi.model.CollectionVoucherItem;
@@ -24,22 +26,22 @@ public class CollectionVoucherService {
     private final BuyerService buyerService;
     private final BillService billService;
     private final CommonService commonService;
+    private final CollectionVoucherMapper collectionVoucherMapper;
 
     public CollectionVoucherService(
             CollectionVoucherRepository collectionVoucherRepository,
             BuyerService buyerService,
             BillService billService,
-            CommonService commonService) {
+            CommonService commonService,
+            CollectionVoucherMapper collectionVoucherMapper) {
         this.collectionVoucherRepository = collectionVoucherRepository;
         this.buyerService = buyerService;
         this.billService = billService;
         this.commonService = commonService;
+        this.collectionVoucherMapper = collectionVoucherMapper;
     }
 
-    public boolean addCollectionVoucher(CollectionVoucher collectionVoucher) {
-        if (collectionVoucher.getCollectionVoucherItemList() == null) {
-            return false;
-        }
+    public void addCollectionVoucher(CollectionVoucher collectionVoucher) {
 
         final var agencyId = commonService.getTenantId();
 
@@ -79,7 +81,6 @@ public class CollectionVoucherService {
 
         collectionVoucherEntity.setCollectionVoucherItemEntityList(collectionVoucherItemEntityList);
         collectionVoucherRepository.save(collectionVoucherEntity);
-        return true;
     }
 
     public boolean deleteVoucher(String voucherNo) {
@@ -143,40 +144,29 @@ public class CollectionVoucherService {
         return collectionVoucherRepository.getCollectedAmountForBillNo(billNo);
     }
 
+    private CollectionVoucherItem enrichWithPendingAmount(CollectionVoucherItem collectionVoucherItem) {
+        String billNo = collectionVoucherItem.getBillNo();
+        BigDecimal billAmount = collectionVoucherItem.getBillAmount();
+        BigDecimal getCollectedAmount = getCollectedAmountForBillNo(billNo);
+        BigDecimal pendingAmount = billAmount.subtract(getCollectedAmount);
+        collectionVoucherItem.setPendingBillAmount(pendingAmount);
+        return collectionVoucherItem;
+    }
+
     @Nullable
     public CollectionVoucher getVoucherByVoucherNo(String voucherNo) {
         CollectionVoucherEntity collectionVoucherEntity =
                 collectionVoucherRepository.getCollectionVoucherByVoucherNo(voucherNo);
 
         if (collectionVoucherEntity == null) {
-            return null;
+            throw new ResourceNotFoundException("Collection Voucher " + voucherNo + " Not Found");
         }
 
-        final var collectionVoucherItemList = collectionVoucherEntity.getCollectionVoucherItemEntityList().stream()
-                .map(collectionVoucherItemEntity -> {
-                    final var billNo = collectionVoucherItemEntity.getBill().getBillNo();
-                    Bill bill = billService.getBill(billNo);
-                    final var supplierName = bill.supplierName();
-                    final var billAmount = bill.billAmount();
-                    final var pendingBillAmount = billAmount.subtract(getCollectedAmountForBillNo(billNo));
-                    return CollectionVoucherItem.builder()
-                            .billNo(billNo)
-                            .supplierName(supplierName)
-                            .billAmount(billAmount)
-                            .pendingBillAmount(pendingBillAmount)
-                            .amountCollected(collectionVoucherItemEntity.getAmountCollected())
-                            .bank(collectionVoucherItemEntity.getBank())
-                            .ddNo(collectionVoucherItemEntity.getDdNo())
-                            .ddDate(collectionVoucherItemEntity.getDdDate())
-                            .build();
-                })
-                .collect(Collectors.toList());
+        CollectionVoucher collectionVoucher = collectionVoucherMapper.toModel(collectionVoucherEntity);
+        collectionVoucher.setCollectionVoucherItemList(collectionVoucher.getCollectionVoucherItemList().stream()
+                .map(this::enrichWithPendingAmount)
+                .toList());
 
-        return CollectionVoucher.builder()
-                .voucherNo(collectionVoucherEntity.getVoucherNo())
-                .voucherDate(collectionVoucherEntity.getVoucherDate())
-                .buyerName(collectionVoucherEntity.getBuyer().getBuyerName())
-                .collectionVoucherItemList(collectionVoucherItemList)
-                .build();
+        return collectionVoucher;
     }
 }
