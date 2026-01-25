@@ -11,10 +11,10 @@ import org.springframework.stereotype.Repository;
 public interface CollectionVoucherRepository extends JpaRepository<CollectionVoucherEntity, String> {
 
     @Query(value = """
-                    select * \
-                    from collection_voucher join collection_voucher_item \
-                    on collection_voucher.voucher_no = collection_voucher_item.fk_collection_voucher_id \
-                    where collection_voucher.buyer_buyer_id = ?1\
+                    select cv.* \
+                    from collection_voucher cv join collection_voucher_item cvi \
+                    on cv.voucher_no = cvi.fk_collection_voucher_id \
+                    where cv.buyer_buyer_id = ?1\
                     """, nativeQuery = true)
     List<CollectionVoucherEntity> getCollectedAmountInfoForBuyerId(String buyerId);
 

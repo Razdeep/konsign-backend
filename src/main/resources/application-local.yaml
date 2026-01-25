@@ -14,6 +14,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
 
 redis:
   host: localhost
@@ -24,3 +27,9 @@ redis:
 
 #jwt:
 #  refreshTokenExpirationInMillis: 1000
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.transaction: TRACE

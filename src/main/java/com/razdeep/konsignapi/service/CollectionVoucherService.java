@@ -68,8 +68,11 @@ public class CollectionVoucherService {
             throw new BadRequestException("buyerName and buyerId is empty");
         }
 
-        List<Bill> billsByBuyerId =
-                !buyerId.isEmpty() ? billService.getBillsByBuyerId(buyerId) : billService.getBillsByBuyerId(buyerName);
+        if (buyerId == null || buyerId.isEmpty()) {
+            buyerId = buyerService.getBuyerByBuyerName(buyerName).getBuyerId();
+        }
+
+        List<Bill> billsByBuyerId = billService.getBillsByBuyerId(buyerId);
 
         final var collectedAmountSoFar = this.getCollectedAmountInfoForBuyerId(buyerId);
         List<PendingBill> res = new ArrayList<>();
