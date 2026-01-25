@@ -2,7 +2,6 @@ package com.razdeep.konsignapi.mapper;
 
 import com.razdeep.konsignapi.entity.BillEntity;
 import com.razdeep.konsignapi.model.Bill;
-import com.razdeep.konsignapi.tenant.TenantContext;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
