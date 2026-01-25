@@ -9,7 +9,7 @@ import lombok.Setter;
 @Table(name = "app_user")
 @Getter
 @Setter
-public class KonsignUser extends BaseTimestamp {
+public class KonsignUser {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

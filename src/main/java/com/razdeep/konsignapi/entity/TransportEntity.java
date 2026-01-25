@@ -14,7 +14,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TransportEntity extends BaseTimestamp {
+public class TransportEntity extends BaseEntity {
     @Id
     private String transportId;
 

@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CollectionVoucherItemEntity extends BaseTimestamp {
+public class CollectionVoucherItemEntity extends BaseEntity {
 
     @Id
     @Column(name = "collection_voucher_item_id")

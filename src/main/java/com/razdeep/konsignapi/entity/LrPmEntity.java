@@ -9,7 +9,7 @@ import lombok.Setter;
 @Table(name = "lrpm")
 @Getter
 @Setter
-public class LrPmEntity extends BaseTimestamp {
+public class LrPmEntity extends BaseEntity {
     @Id
     private String lrPmId;
 

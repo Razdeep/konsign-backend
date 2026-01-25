@@ -33,7 +33,7 @@ public class CommonService {
     }
 
     public String generateInitials(String name) {
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             return null;
         }
 

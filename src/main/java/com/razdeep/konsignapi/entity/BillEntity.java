@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BillEntity extends BaseTimestamp {
+public class BillEntity extends BaseEntity {
     @Id
     private String billNo;
 

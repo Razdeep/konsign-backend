@@ -6,9 +6,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(
-        componentModel = "spring",
-        uses = {LrPmMapper.class})
+@Mapper(componentModel = "spring")
 public interface CollectionVoucherItemMapper {
 
     @Mapping(source = "bill.billNo", target = "billNo")
