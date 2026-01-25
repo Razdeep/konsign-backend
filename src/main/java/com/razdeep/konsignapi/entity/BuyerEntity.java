@@ -11,7 +11,7 @@ import lombok.Setter;
 @Table(name = "buyer")
 @Getter
 @Setter
-public class BuyerEntity extends BaseTimestamp {
+public class BuyerEntity extends BaseEntity {
     @Id
     private String buyerId;
 

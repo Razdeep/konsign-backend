@@ -25,17 +25,12 @@ public interface BillMapper {
 
     @AfterMapping
     default void linkChildren(@MappingTarget BillEntity billEntity) {
-
-        // TODO make sure the tenant id is set using an EntityListener
-        billEntity.setTenantId(TenantContext.getTenantId());
-
         if (billEntity.getLrPmEntityList() == null) return;
 
         AtomicInteger lr_pm_index = new AtomicInteger();
         billEntity.getLrPmEntityList().forEach(lrpm -> {
             lrpm.setBillEntry(billEntity);
             lrpm.setLrPmId(billEntity.getBillNo() + "_" + lr_pm_index.getAndIncrement());
-            lrpm.setTenantId(TenantContext.getTenantId());
         });
     }
 }

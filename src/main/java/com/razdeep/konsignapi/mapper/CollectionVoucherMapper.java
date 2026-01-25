@@ -24,9 +24,6 @@ public interface CollectionVoucherMapper {
     @AfterMapping
     default void linkChildren(@MappingTarget CollectionVoucherEntity collectionVoucherEntity) {
 
-        // TODO make sure the tenant id is set using an EntityListener
-        collectionVoucherEntity.setTenantId(TenantContext.getTenantId());
-
         if (collectionVoucherEntity.getCollectionVoucherItemEntityList() == null) return;
 
         AtomicInteger collectionVoucherItemIndex = new AtomicInteger();
@@ -34,7 +31,6 @@ public interface CollectionVoucherMapper {
             item.setCollectionVoucher(collectionVoucherEntity);
             item.setCollectionVoucherItemId(
                     collectionVoucherEntity.getVoucherNo() + "_" + collectionVoucherItemIndex.getAndIncrement());
-            item.setTenantId(TenantContext.getTenantId());
         });
     }
 }

@@ -12,7 +12,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CollectionVoucherEntity extends BaseTimestamp {
+public class CollectionVoucherEntity extends BaseEntity {
 
     @Id
     private String voucherNo;
