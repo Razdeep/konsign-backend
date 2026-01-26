@@ -21,15 +21,17 @@ docker-compose up
 
 ### Environment variables
 
-| Name              | Value     |
-|-------------------|-----------|
-| REDIS_HOST        | localhost |
-| REDIS_PORT        | 6379      |
-| REDIS_USERNAME    | redis     |
-| REDIS_PASSWORD    | konsign   |
-| POSTGRES_HOST     | localhost |
-| POSTGRES_PORT     | 5432      |
-| POSTGRES_DBNAME   | konsign   |
-| POSTGRES_USERNAME | konsign   |
-| POSTGRES_PASSWORD | konsign   |
-
+| Name                  | Value       |
+|-----------------------|-------------|
+| REDIS_HOST            | localhost   |
+| REDIS_PORT            | 6379        |
+| REDIS_USERNAME        | redis       |
+| REDIS_PASSWORD        | konsign     |
+| POSTGRES_HOST         | localhost   |
+| POSTGRES_PORT         | 5432        |
+| POSTGRES_DBNAME       | konsign     |
+| POSTGRES_USERNAME     | konsign     |
+| POSTGRES_PASSWORD     | konsign     |
+| NEW_RELIC_LICENSE_KEY | LICENSEKEY  |
+| NEW_RELIC_APP_NAME    | konsign-api |
+| NEW_RELIC_ENVIRONMENT | dev         |
