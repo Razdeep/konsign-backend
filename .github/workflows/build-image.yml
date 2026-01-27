@@ -2,7 +2,7 @@ name: Build Image
 
 on:
   push:
-    branches: [ main, newrelic ]
+    branches: [ main ]
 
 env:
   PORT: 8080
