@@ -1,3 +1,10 @@
+CREATE SEQUENCE app_user_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
 -- public.app_user definition
 
 -- Drop table
@@ -5,9 +12,9 @@
 -- DROP TABLE public.app_user;
 
 CREATE TABLE public.app_user (
-	id int8 NOT NULL,
+	id bigint NOT NULL DEFAULT nextval('app_user_seq'),
 	active bool NOT NULL,
-	email_address varchar(255) NULL,
+	email varchar(255) NULL,
 	mobile varchar(255) NULL,
 	"password" varchar(255) NULL,
 	roles varchar(255) NULL,
