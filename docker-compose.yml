@@ -5,6 +5,10 @@ services:
     image: postgres:15
     container_name: postgres
     restart: always
+    command:
+      - "postgres"
+      - "-c"
+      - "shared_preload_libraries=pg_stat_statements"
     environment:
       POSTGRES_USER: konsign
       POSTGRES_PASSWORD: konsign

@@ -24,14 +24,8 @@ public class BuyerService {
     }
 
     public List<Buyer> getBuyers() {
-        String agencyId = commonService.getTenantId();
-        return getBuyersByAgencyId(agencyId);
-    }
-
-    //    @Cacheable(value = "getBuyers", key = "#agencyId")
-    public List<Buyer> getBuyersByAgencyId(String agencyId) {
         List<Buyer> result = new ArrayList<>();
-        buyerRepository.findAllByTenantId(agencyId).forEach((buyerEntity) -> result.add(new Buyer(buyerEntity)));
+        buyerRepository.findAll().forEach((buyerEntity) -> result.add(new Buyer(buyerEntity)));
         return result;
     }
 
@@ -42,9 +36,7 @@ public class BuyerService {
     //    @CacheEvict(value = "getBuyers", allEntries = true)
     public boolean addBuyer(Buyer buyer) {
         String agencyId = commonService.getTenantId();
-        if (!buyerRepository
-                .findAllBuyerByBuyerNameAndTenantId(buyer.getBuyerName(), agencyId)
-                .isEmpty()) {
+        if (!buyerRepository.findAllBuyerByBuyerName(buyer.getBuyerName()).isEmpty()) {
             return false;
         }
 
@@ -69,9 +61,7 @@ public class BuyerService {
 
     //    @CacheEvict(value = "getBuyers", allEntries = true)
     public boolean deleteBuyer(String buyerId) {
-        String agencyId = commonService.getTenantId();
-        boolean wasPresent =
-                buyerRepository.findByBuyerIdAndTenantId(buyerId, agencyId).isPresent();
+        boolean wasPresent = buyerRepository.findByBuyerId(buyerId).isPresent();
         if (wasPresent) {
             buyerRepository.deleteById(buyerId);
         }
@@ -79,19 +69,17 @@ public class BuyerService {
     }
 
     public BuyerEntity getBuyerByBuyerName(String buyerName) {
-        String agencyId = commonService.getTenantId();
-        final var resultList = buyerRepository.findAllBuyerByBuyerNameAndTenantId(buyerName, agencyId);
+        final var resultList = buyerRepository.findAllBuyerByBuyerName(buyerName);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 
     public byte[] generateBuyerLedger(String buyerId) throws Exception {
-        String agencyId = commonService.getTenantId();
         Map<String, Object> payload = new HashMap<>();
 
-        String buyerName = buyerRepository.findBuyerNameByBuyerId(buyerId, agencyId);
+        String buyerName = buyerRepository.findBuyerNameByBuyerId(buyerId);
         payload.put("buyerName", buyerName);
 
-        List<BillCollectionProjection> rows = buyerRepository.computeBuyerLedger(buyerId, agencyId);
+        List<BillCollectionProjection> rows = buyerRepository.computeBuyerLedger(buyerId);
         List<BillCollectionDTO> items = rows.stream()
                 .map(rawRow -> new BillCollectionDTO(
                         rawRow.getBillNo(),

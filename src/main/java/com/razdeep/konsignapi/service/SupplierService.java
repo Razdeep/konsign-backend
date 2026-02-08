@@ -26,26 +26,16 @@ public class SupplierService {
     }
 
     public List<Supplier> getSuppliers() {
-        String agencyId = commonService.getTenantId();
-        return getSupplierByAgencyId(agencyId);
-    }
-
-    //    @Cacheable(value = "getSuppliers", key = "#agencyId")
-    public List<Supplier> getSupplierByAgencyId(String agencyId) {
         List<Supplier> result = new ArrayList<>();
-        List<SupplierEntity> supplierEntityList = supplierRepository.findAllByTenantId(agencyId);
-        if (supplierEntityList == null) {
-            return result;
-        }
+        List<SupplierEntity> supplierEntityList = supplierRepository.findAll();
         supplierEntityList.forEach((supplierEntity) -> result.add(new Supplier(supplierEntity)));
         return result;
     }
 
-    //    @CacheEvict(value = "getSuppliers", allEntries = true)
     public boolean addSupplier(Supplier supplier) {
         String agencyId = commonService.getTenantId();
         if (!supplierRepository
-                .findAllSupplierBySupplierNameAndTenantId(supplier.getSupplierName(), agencyId)
+                .findAllSupplierBySupplierName(supplier.getSupplierName())
                 .isEmpty()) {
             return false;
         }
@@ -67,12 +57,9 @@ public class SupplierService {
         return true;
     }
 
-    //    @CacheEvict(value = "getSuppliers", allEntries = true)
     public boolean deleteSupplier(String supplierId) {
-        String agencyId = commonService.getTenantId();
-        boolean wasPresent = supplierRepository
-                .findSupplierBySupplierIdAndTenantId(supplierId, agencyId)
-                .isPresent();
+        boolean wasPresent =
+                supplierRepository.findSupplierBySupplierId(supplierId).isPresent();
         if (wasPresent) {
             supplierRepository.deleteById(supplierId);
         }
@@ -80,12 +67,10 @@ public class SupplierService {
     }
 
     public SupplierEntity getSupplierBySupplierName(String supplierName) {
-        String agencyId = commonService.getTenantId();
-        final var resultList = supplierRepository.findAllSupplierBySupplierNameAndTenantId(supplierName, agencyId);
+        final var resultList = supplierRepository.findAllSupplierBySupplierName(supplierName);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 
-    // TODO: implement properly later
     public byte[] generateSupplierLedger(String supplierId) throws Exception {
         String supplierName = supplierRepository.findSupplierNameBySupplierId(supplierId);
         Map<String, Object> payload = new HashMap<>();

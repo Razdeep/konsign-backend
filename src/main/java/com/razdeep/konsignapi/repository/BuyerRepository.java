@@ -11,19 +11,19 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BuyerRepository extends JpaRepository<BuyerEntity, String> {
-    List<BuyerEntity> findAllBuyerByBuyerNameAndTenantId(@NonNull String buyerName, @NonNull String tenantId);
+    List<BuyerEntity> findAllBuyerByBuyerName(@NonNull String buyerName);
 
-    List<BuyerEntity> findAllByTenantId(@NonNull String tenantId);
+    @NonNull
+    List<BuyerEntity> findAll();
 
-    Optional<BuyerEntity> findByBuyerIdAndTenantId(@NonNull String buyerId, @NonNull String tenantId);
+    Optional<BuyerEntity> findByBuyerId(@NonNull String buyerId);
 
     @Query("""
         select b.buyerName
         from BuyerEntity b
         where b.buyerId = :buyerId
-            and b.tenantId = :tenantId
     """)
-    String findBuyerNameByBuyerId(String buyerId, String tenantId);
+    String findBuyerNameByBuyerId(String buyerId);
 
     @Query(value = """
 with collection_joined as (
@@ -33,8 +33,7 @@ from
 	collection_voucher
 join collection_voucher_item on
 	voucher_no = fk_collection_voucher_id
-where buyer_buyer_id = :buyerId
-and collection_voucher.tenant_id = :tenantId),
+where buyer_buyer_id = :buyerId),
 bill_joined as (
 select
 	*
@@ -61,5 +60,5 @@ join collection_joined
 on
 	bill_joined.bill_no = collection_joined.bill_bill_no;
             """, nativeQuery = true)
-    List<BillCollectionProjection> computeBuyerLedger(@NonNull String buyerId, @NonNull String tenantId);
+    List<BillCollectionProjection> computeBuyerLedger(@NonNull String buyerId);
 }
