@@ -8,7 +8,7 @@ public class UserRegistration {
     @NonNull
     private String username;
 
-    private String emailAddress;
+    private String email;
 
     private String mobile;
 

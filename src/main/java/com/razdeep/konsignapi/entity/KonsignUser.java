@@ -11,14 +11,15 @@ import lombok.Setter;
 @Setter
 public class KonsignUser {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "app_user_seq_gen")
+    @SequenceGenerator(name = "app_user_seq_gen", sequenceName = "app_user_seq", allocationSize = 1)
     private long id;
 
     @Column(name = "username", unique = true)
     private String username;
 
     private String password;
-    private String emailAddress;
+    private String email;
     private String mobile;
     private String tenantId;
     private boolean active;
@@ -29,7 +30,7 @@ public class KonsignUser {
     public KonsignUser(UserRegistration userRegistration) {
         username = userRegistration.getUsername();
         password = userRegistration.getPassword();
-        emailAddress = userRegistration.getEmailAddress();
+        email = userRegistration.getEmail();
         mobile = userRegistration.getMobile();
         tenantId = userRegistration.getTenantId();
         active = true;

@@ -64,14 +64,9 @@ public class BillService {
         billEntryRepository.save(billEntity);
     }
 
-    public Bill getBill(String billNo) {
-        String tenantId = commonService.getTenantId();
-        return getBill(billNo, tenantId);
-    }
+    public Bill getBill(String billNo) throws ResourceNotFoundException {
 
-    public Bill getBill(String billNo, String tenantId) throws ResourceNotFoundException {
-
-        final var billEntryOptional = billEntryRepository.findByBillNoAndTenantId(billNo, tenantId);
+        final var billEntryOptional = billEntryRepository.findByBillNo(billNo);
         if (billEntryOptional.isEmpty()) {
             throw new ResourceNotFoundException("Bill " + billNo + " not found");
         }
@@ -117,7 +112,7 @@ public class BillService {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
         Pageable pageable = PageRequest.of(offset, size, Sort.by("billNo").descending());
-        final var billEntityPages = billEntryRepository.findByTenantId(agencyId, pageable);
+        final var billEntityPages = billEntryRepository.findAll(pageable);
         stopWatch.stop();
         LOG.info("repository call took {} ms", stopWatch.getLastTaskTimeMillis());
 

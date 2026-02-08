@@ -5,6 +5,7 @@ plugins {
     id("java")
     id("com.diffplug.spotless") version "8.1.0"
     id("org.openrewrite.rewrite") version "7.23.0"
+    id("org.flywaydb.flyway") version "10.0.0"
 }
 
 group = "com.razdeep"
@@ -60,6 +61,8 @@ dependencies {
     implementation(libs.jedis)
     implementation(libs.spring.boot.starter.cache)
     implementation(libs.jackson.jsr310)
+
+    implementation("org.flywaydb:flyway-core")
 
     runtimeOnly(libs.micrometer.prometheus)
 

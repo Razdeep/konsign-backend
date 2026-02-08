@@ -28,7 +28,7 @@ public class TransportService {
         String agencyId = commonService.getTenantId();
 
         if (!transportRepository
-                .findAllTransportByTransportNameAndTenantId(transport.getTransportName(), agencyId)
+                .findAllTransportByTransportName(transport.getTransportName())
                 .isEmpty()) {
             return false;
         }
@@ -58,21 +58,14 @@ public class TransportService {
     }
 
     public TransportEntity getTransportByTransportName(String transportName) {
-        String agencyId = commonService.getTenantId();
-        final var resultList = transportRepository.findAllTransportByTransportNameAndTenantId(transportName, agencyId);
+        final var resultList = transportRepository.findAllTransportByTransportName(transportName);
         return resultList == null || resultList.isEmpty() ? null : resultList.get(0);
     }
 
     public List<Transport> getTransports() {
-        String agencyId = commonService.getTenantId();
-        return getTransports(agencyId);
-    }
-
-    //    @Cacheable(value = "getTransports", key = "#agencyId")
-    public List<Transport> getTransports(String agencyId) {
         List<Transport> result = new ArrayList<>();
         transportRepository
-                .findAllByTenantId(agencyId)
+                .findAll()
                 .forEach((transportEntity) -> result.add(
                         new Transport(transportEntity.getTransportId(), transportEntity.getTransportName())));
         return result;
@@ -80,12 +73,9 @@ public class TransportService {
 
     //    @CacheEvict(value = "getTransports", allEntries = true)
     public boolean deleteTransport(String transportId) {
-        String agencyId = commonService.getTenantId();
-        boolean wasPresent = transportRepository
-                .findByTransportIdAndTenantId(transportId, agencyId)
-                .isPresent();
+        boolean wasPresent = transportRepository.findByTransportId(transportId).isPresent();
         if (wasPresent) {
-            transportRepository.deleteByTransportIdAndTenantId(transportId, agencyId);
+            transportRepository.deleteByTransportId(transportId);
         }
         return wasPresent;
     }

@@ -1,12 +1,12 @@
 [versions]
-springboot = "3.0.6"
+springboot = "3.5.10"
 jjwt = "0.9.1"
 jaxb = "2.4.0-b180830.0359"
 postgres = "42.7.8"
 lombok = "1.18.30" # put actual version you use
 lombokmapstruct = "0.2.0"
 mapstruct = "1.6.3"
-springdoc = "1.6.14"
+springdoc = "1.8.0"
 jedis = "4.4.2"
 jackson = "2.15.0"
 micrometer = "1.11.0" # adjust if needed
